@@ -56,6 +56,6 @@ yarn-error.log*
 !.elasticbeanstalk/*.global.yml
 
 # Amplify
-/amplify
+/amplify/*
 !/amplify/.gitkeep
 !/amplify/.gitignore
