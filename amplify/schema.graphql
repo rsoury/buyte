@@ -1,84 +1,26 @@
+enum WalletPaymentOptions {
+	APPLE_PAY
+	GOOGLE_PAY
+}
+
+enum PaymentProvider {
+	STRIPE
+	ADYEN
+}
+
 type Checkout @model @auth(rules: [{ allow: owner }]) @versioned {
 	id: ID!
 	label: String!
 	description: String
-	connection: ProviderConnection!
-		@connection(name: "CheckoutProviderConnection")
-	paymentOptions: [CheckoutPaymentOption!]!
-		@connection(name: "CheckoutPayments")
+	connection: ProviderConnection! @connection(name: "CheckoutProviderConnection")
+	paymentOptions: [WalletPaymentOptions!]!
 	isArchived: Boolean!
-}
-type CheckoutPaymentOption
-	@model(queries: null)
-	@auth(rules: [{ allow: owner }]) {
-	id: ID!
-	checkout: Checkout! @connection(name: "CheckoutPayments")
-	paymentOption: MobileWebPayment! @connection(name: "PaymentsByCheckout")
-}
-
-# Users have to be in the SuperUsers group to mutate.
-type PaymentProvider
-	@model
-	@auth(
-		rules: [
-			{
-				allow: groups
-				groups: ["SuperUsers"]
-				queries: null
-				mutations: [create, update, delete]
-			}
-		]
-	)
-	@versioned {
-	id: ID!
-	name: String!
-	image: String!
-	paymentOptions: [ProviderPaymentOption!]!
-		@connection(name: "ProviderPayments")
-	connections: [ProviderConnection]! @connection(name: "Connection")
-}
-# Creating a model specifically to correlate many-to-many model connections.
-type ProviderPaymentOption
-	@model(queries: null)
-	@auth(
-		rules: [
-			{
-				allow: groups
-				groups: ["SuperUsers"]
-				queries: null
-				mutations: [create, update, delete]
-			}
-		]
-	) {
-	id: ID!
-	provider: PaymentProvider! @connection(name: "ProviderPayments")
-	paymentOption: MobileWebPayment! @connection(name: "PaymentsByProvider")
-}
-
-type MobileWebPayment
-	@model
-	@auth(
-		rules: [
-			{
-				allow: groups
-				groups: ["SuperUsers"]
-				queries: null
-				mutations: [create, update, delete]
-			}
-		]
-	)
-	@versioned {
-	id: ID!
-	name: String!
-	image: String!
-	checkouts: [CheckoutPaymentOption] @connection(name: "PaymentsByCheckout")
-	providers: [ProviderPaymentOption] @connection(name: "PaymentsByProvider")
 }
 
 type ProviderConnection @model(queries: null) @auth(rules: [{ allow: owner }]) {
 	id: ID!
 	isTest: Boolean!
-	provider: PaymentProvider! @connection(name: "Connection")
+	provider: PaymentProvider!
 	checkouts: [Checkout!]! @connection(name: "CheckoutProviderConnection")
 	type: String!
 	credentials: AWSJSON!
@@ -99,7 +41,7 @@ type PaymentToken @model @auth(rules: [{ allow: owner }]) {
 	id: ID!
 	value: AWSJSON!
 	checkout: Checkout! @connection
-	paymentMethod: MobileWebPayment! @connection
+	paymentMethod: WalletPaymentOptions!
 	selectedShippingMethod: SelectedShippingMethod
 	amount: Int!
 	currency: String!
