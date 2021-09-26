@@ -34,7 +34,6 @@ vendor/
 .env
 .env.*
 !.env.example
-.vscode
 partner*
 mocks
 bindata.go
@@ -59,3 +58,4 @@ yarn-error.log*
 /amplify/*
 !/amplify/.gitkeep
 !/amplify/.gitignore
+!/amplify/schema.graphql

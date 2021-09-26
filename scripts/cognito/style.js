@@ -7,7 +7,7 @@ const fs = require("fs");
 const path = require("path");
 const AWS = require("aws-sdk");
 const logger = require("tracer").console();
-const { default: getAWSConfig } = require("../../build/bundle");
+const getAWSConfig = require("../../serverless/resources/get-config");
 const getEnv = require("../shared/get-env");
 
 const env = getEnv();

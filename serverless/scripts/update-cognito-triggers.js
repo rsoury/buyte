@@ -1,13 +1,14 @@
+/* eslint-disable no-console */
+
 const colors = require("colors");
 const AWS = require("aws-sdk");
-const util = require("util");
-const _get = require("lodash.get");
+const get = require("lodash.get");
 
 if (typeof serverless === "undefined") {
 	throw new Error("Run script in Serverless hook: Cannot find serverless.");
 }
 
-const region = _get(serverless, "service.provider.region");
+const region = get(serverless, "service.provider.region");
 const cognitoISP = new AWS.CognitoIdentityServiceProvider({
 	region
 });
@@ -42,9 +43,9 @@ const updateUserPool = params =>
 
 (async () => {
 	const accountId = await getAccountId();
-	const service = _get(serverless, "service.service");
-	const stage = _get(serverless, "service.provider.stage");
-	const userPoolId = _get(
+	const service = get(serverless, "service.service");
+	const stage = get(serverless, "service.provider.stage");
+	const userPoolId = get(
 		serverless,
 		`service.custom.cognito.${stage}.userPoolId`
 	);

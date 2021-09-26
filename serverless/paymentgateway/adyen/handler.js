@@ -2,7 +2,6 @@ const fs = require("fs");
 const path = require("path");
 const LaunchChrome = require("@serverless-chrome/lambda");
 const CDP = require("chrome-remote-interface");
-const util = require("util");
 const version = require("./chrome/version");
 
 const chromeSettings = {
@@ -35,12 +34,12 @@ module.exports.cse = async event => {
 		__dirname,
 		"../../../node_modules/adyen-cse-web/js/adyen.encrypt.nodom.min.js"
 	);
-	const package = await new Promise((resolve, reject) => {
+	const adyenPackage = await new Promise((resolve, reject) => {
 		fs.readFile(filepath, "utf8", (err, data) => {
 			if (err) {
 				return reject(err);
 			}
-			resolve(data);
+			return resolve(data);
 		});
 	});
 	// Get data from event.
@@ -52,7 +51,7 @@ module.exports.cse = async event => {
 		toEncryptString += `${key}: "${value}",`;
 	});
 	const script = `
-		${package}
+		${adyenPackage}
 		(function(){
 			var cseInstance = window.adyen.encrypt.createEncryption("${cseKey}", {
 				enableValidations: false
@@ -68,7 +67,7 @@ module.exports.cse = async event => {
 	const { result, exceptionDetails } = await Runtime.evaluate({
 		expression: script
 	});
-	if (!!exceptionDetails) {
+	if (exceptionDetails) {
 		console.log(exceptionDetails);
 	}
 
@@ -79,7 +78,7 @@ module.exports.cse = async event => {
 	return result;
 };
 
-module.exports.chrome_version = async event => {
+module.exports.chrome_version = async () => {
 	// Setup Chrome
 	await LaunchChrome(chromeSettings);
 

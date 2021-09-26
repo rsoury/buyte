@@ -2,7 +2,11 @@
 
 require("colors");
 const argv = require("minimist")(process.argv.slice(2));
-const { environments } = require("../../build/bundle");
+
+const environments = {
+	DEV: "dev",
+	PROD: "prod"
+};
 
 module.exports = function getEnv() {
 	let envArg = argv.env || argv.e;

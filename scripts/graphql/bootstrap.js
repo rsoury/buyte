@@ -26,7 +26,7 @@ const argv = require("minimist")(process.argv.slice(2));
 const AmazonCognitoIdentity = require("amazon-cognito-identity-js");
 const { AUTH_TYPE } = require("aws-appsync/lib/link/auth-link");
 const { default: AWSAppSyncClient } = require("aws-appsync");
-const { default: getAWSConfig } = require("../../build/bundle");
+const getAWSConfig = require("../../serverless/resources/get-config");
 const getEnv = require("../shared/get-env");
 
 const env = getEnv();

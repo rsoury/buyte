@@ -7,7 +7,7 @@ const AWS = require("aws-sdk");
 const argv = require("minimist")(process.argv.slice(2));
 const inquirer = require("inquirer");
 const logger = require("tracer").console();
-const { default: getAWSConfig } = require("../../build/bundle");
+const getAWSConfig = require("../../serverless/resources/get-config");
 const getEnv = require("../shared/get-env");
 
 const env = getEnv();

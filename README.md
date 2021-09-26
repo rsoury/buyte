@@ -1,20 +1,65 @@
 # Buyte
 
+**Open Source Digital Wallet Checkout**.  
+Accelerate your eCommerce website checkout with an all-in-one solution that integrates Apple Pay and Google Pay in with your own Payment Processor. Completely serverless tokenisation and payment processing for digital wallet solutions built for the AWS Cloud.
+
+![Buyte Logo](https://github.com/rsoury/buyte/blob/master/scripts/cognito/logo.png)
+
+[See a demo on YouTube](https://www.youtube.com/watch?v=fKnVh8_HLwk)  
+[See some example images of the application](https://github.com/rsoury/buyte/blob/master/examples/images/)
+
+## Overview
+
 This repository includes all core services (Serverless API, CLI, Scripts, and AWS Amplify Configuration).  
 
-The Binary built is a CLI tool capable of running commands for administrative and development purposes as well as a command for starting the Tokenisation and Payment Processing API.
+The produced Binary is a CLI tool capable of running commands for administrative and development purposes as well as a command for starting the Tokenisation and Payment Processing API.
+
+## Architecture
+
+## Getting Started
+
+1. Clone the repository `git clone git@github.com:rsoury/buyte.git`
+2. Install Node.js Depdencies: `yarn`
+
+### 1. Amplify
+
+1. Set up your Amplify Configuration
+   1. `amplify configure`
+   2. Make a `dev` directory under the amplify directory. In each directory (`dev` or `prod`), you can manage an environment for your Amplify configurations. We advise comitting these configurations to a private repository. These configuratons will include reference to components in your cloud infrastucture.
+      1. `mkdir -p ./amplify/dev`
+      2. `cd ./amplify/dev`
+   3. `amplify init`
+2. Add a Data Storage (DynamoDB and AppSync GraphQL) to Amplify
+   `amplify api add`
+   1. Select **"GraphQL"** for the interface and **"Amazon Cognito User Pools"** for authentication
+   2. Select **"Yes"** for "Do you want to configure advanced settings for the GraphQL API" and provide the path to the GraphQL Schema `../graphql.schema`
+3. Add Auth (Cognito) to Amplify  
+   `amplify add auth`  
+   You should receive a message that Auth has already been added.  
+4. Push your Amplify configuration  
+   `amplify push`
+   Ensure you auto-generate code from GraphQL schema when prompted.
+5. Add the GraphQL Endpoint to your Environment file `.env.development` or `.env.production`
+
+### 2. CLI
+
+1. Install Golang dependencies - `go mod download`
+2. Build the binary - `make`
+3. Run the API in Development - `buyte api`
+4. Run the API in Production - `buyte api --production`
+
+For development, use `make init && make watch` to rebuild the binary on file change.
+
+### 3. Serverless
+
+1. Deploy to AWS - `sls deploy`
+
+For development, use `sls offline` to test requests to a locally hosted web server.
 
 ## Requirements
 
 - Go 1.9.1+
 - CFSSL: `go get -u github.com/cloudflare/cfssl/cmd/...`
-
-## Getting Started
-
-1. Download: `git clone git@github.com:rsoury/buyte.git`
-2. Install Node.js Depdencies: `yarn`
-3. Build: `make`
-4. Run: `buyte api --production`
 
 ## Testing
 
@@ -24,10 +69,10 @@ go test -v
 
 ## Caveats
 
-- [ApplePay](https://github.com/rsoury/applepay/) depdency has some caveats
+- [ApplePay](https://github.com/rsoury/applepay/) dependency has some caveats:
   - You may need to change your `PKG_CONFIG_PATH` to include OpenSSL. For example, on my Mac I use `PKG_CONFIG_PATH=$(brew --prefix openssl)/lib/pkgconfig go test`.
   - After Serverless Deploy, go to AWS Cognito and save the Cognito Triggers page.  
-There is a bug here where without the save, they will not run when required.
+  There is a bug here where without the save, they will not run when required.
 
 ## Development Endpoints
 

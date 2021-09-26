@@ -1,4 +1,9 @@
-const { getAWSConfig, environments } = require("../../src");
+const getAWSConfig = require("./get-config");
+
+const environments = {
+	DEV: "dev",
+	PROD: "prod"
+};
 
 module.exports.dev = () => getAWSConfig(environments.DEV);
 

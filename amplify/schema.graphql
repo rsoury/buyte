@@ -100,7 +100,6 @@ type PaymentToken @model @auth(rules: [{ allow: owner }]) {
 	value: AWSJSON!
 	checkout: Checkout! @connection
 	paymentMethod: MobileWebPayment! @connection
-	shippingMethod: PriceRate @connection
 	selectedShippingMethod: SelectedShippingMethod
 	amount: Int!
 	currency: String!
