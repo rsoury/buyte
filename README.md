@@ -1,7 +1,7 @@
 # Buyte
 
 **Open Source Digital Wallet Checkout**.  
-Accelerate your eCommerce website checkout with an all-in-one solution that integrates Apple Pay and Google Pay in with your own Payment Processor. Completely serverless tokenisation and payment processing for digital wallet solutions built for the AWS Cloud.
+Accelerate your eCommerce website checkout with an all-in-one solution that integrates Apple Pay and Google Pay with your Payment Processor(s). Completely serverless tokenisation and payment processing for digital wallet solutions built for the AWS Cloud.
 
 ![Buyte Logo](https://github.com/rsoury/buyte/blob/master/docs/logo.png)
 
@@ -21,13 +21,13 @@ The produced Binary is a CLI tool capable of running commands for administrative
 ## Getting Started
 
 1. Clone the repository `git clone git@github.com:rsoury/buyte.git`
-2. Install Node.js Depdencies: `yarn`
+2. Install Node.js Dependencies: `yarn`
 
 ### 1. Amplify
 
 1. Set up your Amplify Configuration
    1. `amplify configure`
-   2. Make a `dev` directory under the amplify directory. In each directory (`dev` or `prod`), you can manage an environment for your Amplify configurations. We advise comitting these configurations to a private repository. These configuratons will include reference to components in your cloud infrastucture.
+   2. Make a `dev` directory under the amplify directory. In each directory (`dev` or `prod`), you can manage an environment for your Amplify configurations. We advise committing these configurations to a private repository. These configurations will include references to components in your cloud infrastructure.
       1. `mkdir -p ./amplify/dev`
       2. `cd ./amplify/dev`
    3. `amplify init`
@@ -68,13 +68,17 @@ For development, use `sls offline` to test requests to a locally hosted web serv
 go test -v
 ```
 
+## ApplePay Certificates
+
+[Visit the Certs directory](https://github.com/rsoury/buyte/blob/master/certs/) and follow the guide to produce your Apple Pay Certificates
+
 ## Caveats
 
 - [ApplePay](https://github.com/rsoury/applepay/) dependency has some caveats:
   - You may need to change your `PKG_CONFIG_PATH` to include OpenSSL. For example, on my Mac I use `PKG_CONFIG_PATH=$(brew --prefix openssl)/lib/pkgconfig go test`.
-  - After Serverless Deploy, go to AWS Cognito and save the Cognito Triggers page.  
-  There is a bug here where without the save, they will not run when required.
+  - After Serverless Deploy, go to AWS Cognito in AWS console and save the Cognito Triggers page.  
+  **There is a bug here where without saving manually, they will not run when required.**
 
 ## Development Endpoints
 
-Development endpoints were made to assist in spinning up a landing page with the appropirate digital wallet.
+Development endpoints were made to assist in spinning up a landing page with the appropriate digital wallet.

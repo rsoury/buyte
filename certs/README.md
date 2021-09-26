@@ -29,3 +29,5 @@ Requirements:
 7. Deploy the application under your domain.
 
 8.  Go to the running application and try to pay with Apple Pay. If you don't see an Apple Pay button, you are probably visiting from an unsupported browser or device. You will not be charged.
+
+Store your certs (*.crt and *.pem files) somewhere remotely and download them during CI/CD or programmatic environment set up.
