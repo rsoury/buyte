@@ -38,7 +38,6 @@ partner*
 mocks
 bindata.go
 
-
 # Don't include the dev resources
 .air
 
@@ -59,3 +58,7 @@ yarn-error.log*
 !/amplify/.gitkeep
 !/amplify/.gitignore
 !/amplify/schema.graphql
+
+# Certificates
+/certs/*.crt
+/certs/*.pem
