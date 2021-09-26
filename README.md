@@ -3,7 +3,7 @@
 **Open Source Digital Wallet Checkout**.  
 Accelerate your eCommerce website checkout with an all-in-one solution that integrates Apple Pay and Google Pay in with your own Payment Processor. Completely serverless tokenisation and payment processing for digital wallet solutions built for the AWS Cloud.
 
-![Buyte Logo](https://github.com/rsoury/buyte/blob/master/logo.png)
+![Buyte Logo](https://github.com/rsoury/buyte/blob/master/docs/logo.png)
 
 [See a demo on YouTube](https://www.youtube.com/watch?v=fKnVh8_HLwk)  
 [See some example images of the application](https://github.com/rsoury/buyte/blob/master/examples/images/)
@@ -15,6 +15,8 @@ This repository includes all core services (Serverless API, CLI, Scripts, and AW
 The produced Binary is a CLI tool capable of running commands for administrative and development purposes as well as a command for starting the Tokenisation and Payment Processing API.
 
 ## Architecture
+
+![Buyte Architecture](https://github.com/rsoury/buyte/blob/master/docs/Buyte-Architecture.jpeg)
 
 ## Getting Started
 
