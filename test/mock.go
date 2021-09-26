@@ -22,11 +22,7 @@ func NewMock() *Mock {
 
 // Standalone func for testing.
 func (m *Mock) Authentication(authToken string) map[string]string {
-	user, err := authenticate.NewUser(authToken, &authenticate.AWSConfig{
-		Region:            "ap-southeast-2",
-		CognitoClientId:   "a7pn1ss0adtqgn2gtphdgchfs",
-		CognitoUserPoolId: "ap-southeast-2_MGy8dtCFj",
-	})
+	user, err := authenticate.NewUserWithEnv(authToken)
 	if err != nil {
 		m.logger.Errorw("Could not create user to authenticate in MockAPIGateway...", "user", user.Id, "error", err)
 		return nil

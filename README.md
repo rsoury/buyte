@@ -60,6 +60,14 @@ Once this codebase has been set up, please visit:
 
 [Visit the Certs directory](https://github.com/rsoury/buyte/blob/master/certs/) and follow the guide to produce your Apple Pay Certificates
 
+### 3. Serverless
+
+1. Deploy to AWS
+   For Production - `sls deploy --env production --stage prod`
+   For Development - `sls deploy`
+
+For development, use `sls offline` to test requests to a locally hosted web server.
+
 ### 3. CLI
 
 1. Install Golang dependencies - `go mod download`
@@ -68,12 +76,6 @@ Once this codebase has been set up, please visit:
 4. Run the API in Production - `buyte api --production`
 
 For development, use `make init && make watch` to rebuild the binary on file change.
-
-### 4. Serverless
-
-1. Deploy to AWS - `sls deploy`
-
-For development, use `sls offline` to test requests to a locally hosted web server.
 
 ### 5. Finalise Cognito
 

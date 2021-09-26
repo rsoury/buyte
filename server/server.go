@@ -109,6 +109,7 @@ func New(store buyte.Store) (*Server, error) {
 	})
 	// For Development Purposes
 	if config.GetBool("server.mock.authorizer") {
+		zap.L().Info("Mocking Authorizers for Development")
 		r.Use(apiStrictMiddleware(test.NewMock().APIGatewayHeaders))
 	}
 	// Setup Middleware for User Request Context
@@ -188,7 +189,7 @@ func New(store buyte.Store) (*Server, error) {
 		),
 	)
 	if err != nil {
-		zap.L().Fatal("Apple Pay Setup", zap.Error(err))
+		zap.L().Warn("Cannot find Apple Pay Certificates. Running API without Apple Pay authority.", zap.Error(err))
 	}
 
 	s := &Server{

@@ -35,10 +35,10 @@ type CognitoAssociateData struct {
 // Compatible with "github.com/caarlos0/env"
 type AWSConfig struct {
 	Region                string `env:"AWS_REGION" envDefault:"ap-southeast-2"`
-	APIGatewayId          string `env:"API_GATEWAY_ID,required"`
-	APIGatewayStage       string `env:"API_GATEWAY_STAGE,required"`
-	APIGatewayUsagePlanId string `env:"API_GATEWAY_USAGE_PLAN_ID,required"`
-	CognitoUserPoolId     string `env:"COGNITO_USER_POOL_ID,required"`
+	APIGatewayId          string `env:"API_GATEWAY_ID"`
+	APIGatewayStage       string `env:"API_GATEWAY_STAGE"`
+	APIGatewayUsagePlanId string `env:"API_GATEWAY_USAGE_PLAN_ID"`
+	CognitoUserPoolId     string `env:"COGNITO_USERPOOLID"`
 }
 
 type Keys struct {
@@ -55,6 +55,7 @@ func NewEnvConfig() *AWSConfig {
 	}
 	return config
 }
+
 func NewKeyManager(userId string, name string, awsConfig *AWSConfig) *Keys {
 	return &Keys{
 		UserId: userId,
@@ -77,6 +78,7 @@ func (k *Keys) GenerateKey(isPublic bool) string {
 
 	return data
 }
+
 func (k *Keys) CreateApiKey(key string, isPublic bool) (*ApiKey, error) {
 	sess, _ := session.NewSession(
 		&aws.Config{Region: aws.String(k.Config.Region)},
@@ -124,6 +126,7 @@ func (k *Keys) CreateApiKey(key string, isPublic bool) (*ApiKey, error) {
 
 	return &ApiKey{apiKey, usagePlanKey}, nil
 }
+
 func (k *Keys) AssociateApiKeyIdsWithCognito(data []*CognitoAssociateData) error {
 	// isPublic bool, apiKeyId string
 	sess, _ := session.NewSession(

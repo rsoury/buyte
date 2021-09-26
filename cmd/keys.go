@@ -1,10 +1,7 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"path"
 	"time"
 
 	"github.com/briandowns/spinner"
@@ -13,19 +10,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/rsoury/buyte/pkg/keymanager"
-	"github.com/rsoury/buyte/pkg/util"
 )
-
-// TODO: Get email from UserId?
-
-type StackInfo struct {
-	ApiGatewayUsagePlan            string `json:"ApiGatewayUsagePlan"`
-	CognitoUserPool                string `json:"CognitoUserPool"`
-	Stage                          string `json:"Stage"`
-	Region                         string `json:"Region"`
-	ApiGatewayRestApi              string `json:"ApiGatewayRestApi"`
-	ServerlessDeploymentBucketName string `json:"ServerlessDeploymentBucketName"`
-}
 
 // keysCmd represents the keys command
 var keysCmd = &cli.Command{
@@ -49,10 +34,15 @@ var keysAddCmd = &cli.Command{
 			s.Stop()
 		}()
 
-		stage, _ := cmd.Flags().GetString("stage")
 		userId, _ := cmd.Flags().GetString("user-id")
 		email, _ := cmd.Flags().GetString("email")
 		isPublic, _ := cmd.Flags().GetBool("public")
+
+		stage, _ := cmd.Flags().GetString("stage")
+		region, _ := cmd.Flags().GetString("region")
+		apiGatewayId, _ := cmd.Flags().GetString("api-gateway-id")
+		apiGatewayUsagePlanId, _ := cmd.Flags().GetString("api-gateway-usage-plan-id")
+		cognitoUserPoolId, _ := cmd.Flags().GetString("cognito-user-pool-id")
 
 		if email == "" {
 			logger.Fatal("Email flag required. ie. hello@buytecheckout.com")
@@ -68,7 +58,13 @@ var keysAddCmd = &cli.Command{
 		// 	`public`, isPublic,
 		// )
 
-		AddKey(stage, userId, email, isPublic)
+		AddKey(&keymanager.AWSConfig{
+			Region:                region,
+			APIGatewayId:          apiGatewayId,
+			APIGatewayStage:       stage,
+			APIGatewayUsagePlanId: apiGatewayUsagePlanId,
+			CognitoUserPoolId:     cognitoUserPoolId,
+		}, userId, email, isPublic)
 	},
 }
 
@@ -86,19 +82,37 @@ var keysDeleteCmd = &cli.Command{
 		}()
 
 		stage, _ := cmd.Flags().GetString("stage")
+		region, _ := cmd.Flags().GetString("region")
+		apiGatewayId, _ := cmd.Flags().GetString("api-gateway-id")
+		apiGatewayUsagePlanId, _ := cmd.Flags().GetString("api-gateway-usage-plan-id")
+		cognitoUserPoolId, _ := cmd.Flags().GetString("cognito-user-pool-id")
+
 		userId, _ := cmd.Flags().GetString("user-id")
 
 		if userId == "" {
 			logger.Fatal("User ID flag required. ie. e7b859c1-81d0-4d0f-b839-6b4510304f1c")
 		}
 
-		DeleteKeys(stage, userId)
+		DeleteKeys(&keymanager.AWSConfig{
+			Region:                region,
+			APIGatewayId:          apiGatewayId,
+			APIGatewayStage:       stage,
+			APIGatewayUsagePlanId: apiGatewayUsagePlanId,
+			CognitoUserPoolId:     cognitoUserPoolId,
+		}, userId)
 	},
 }
 
 func init() {
 	// Add "keys" to "root"
 	rootCmd.AddCommand(keysCmd)
+
+	envConfig := keymanager.NewEnvConfig()
+	keysCmd.PersistentFlags().StringP("region", "r", envConfig.Region, "The region of the environment.")
+	keysCmd.PersistentFlags().StringP("stage", "s", envConfig.APIGatewayStage, "The stage environment.")
+	keysCmd.PersistentFlags().StringP("api-gateway-id", "a", envConfig.APIGatewayId, "The API Gateway ID to use.")
+	keysCmd.PersistentFlags().StringP("api-gateway-usage-plan-id", "x", envConfig.APIGatewayUsagePlanId, "The API Gateway Usage Plan ID to associate the new API keys to.")
+	keysCmd.PersistentFlags().StringP("cognito-user-pool-id", "c", envConfig.CognitoUserPoolId, "The Cognito User Pool ID that the User belongs to.")
 
 	// Add "add" to "keys"
 	keysCmd.AddCommand(keysAddCmd)
@@ -107,50 +121,15 @@ func init() {
 	keysAddCmd.PersistentFlags().BoolP("public", "p", false, "Is key public? False by default.")
 	keysAddCmd.PersistentFlags().StringP("email", "e", "", "What is the email for this user?")
 	keysAddCmd.PersistentFlags().StringP("user-id", "u", "", "What is the user ID for this user? Leave empty to use email as user ID")
-	keysAddCmd.PersistentFlags().StringP("stage", "s", "dev", "The stage environment to create the keys for. (dev | prod)")
 	keysAddCmd.MarkFlagRequired("email")
 	keysAddCmd.MarkFlagRequired("user-id")
 	keysDeleteCmd.PersistentFlags().StringP("user-id", "u", "", "What is the user ID for this user? Leave empty to use email as user ID")
-	keysDeleteCmd.PersistentFlags().StringP("stage", "s", "dev", "The stage environment to create the keys for. (dev | prod)")
 	keysDeleteCmd.MarkFlagRequired("user-id")
 }
 
-func loadStackInfo(stage string) (StackInfo, error) {
-	// Read config from deploy stack output file
-	// Open our jsonFile from bin folder.
-	stackInfoFileName := stage + "-stack-info.json"
-	filepath := path.Join(util.DirName(), "../", stackInfoFileName)
-	plan, err := ioutil.ReadFile(filepath)
-	if err != nil {
-		return StackInfo{}, err
-	}
-	var stackInfo StackInfo
-	err = json.Unmarshal(plan, &stackInfo)
-	if err != nil {
-		return StackInfo{}, err
-	}
-
-	return stackInfo, nil
-}
-
-func AddKey(stage, userId, email string, isPublic bool) {
-	stackInfo, err := loadStackInfo(stage)
-	if err != nil {
-		logger.Fatalw("Cannot open stack info file",
-			"file", stage+"-stack-info.json",
-			"err", err,
-		)
-		return
-	}
-
+func AddKey(awsConfig *keymanager.AWSConfig, userId, email string, isPublic bool) {
 	// Initiate KeyManager
-	manager := keymanager.NewKeyManager(userId, email, &keymanager.AWSConfig{
-		Region:                stackInfo.Region,
-		APIGatewayId:          stackInfo.ApiGatewayRestApi,
-		APIGatewayStage:       stackInfo.Stage,
-		APIGatewayUsagePlanId: stackInfo.ApiGatewayUsagePlan,
-		CognitoUserPoolId:     stackInfo.CognitoUserPool,
-	})
+	manager := keymanager.NewKeyManager(userId, email, awsConfig)
 
 	key := manager.GenerateKey(isPublic)
 	apiKey, err := manager.CreateApiKey(key, isPublic)
@@ -178,26 +157,11 @@ func AddKey(stage, userId, email string, isPublic bool) {
 	fmt.Println(Green("SUCCESS!"))
 }
 
-func DeleteKeys(stage, userId string) {
-	stackInfo, err := loadStackInfo(stage)
-	if err != nil {
-		logger.Fatalw("Cannot open stack info file",
-			"file", stage+"-stack-info.json",
-			"err", err,
-		)
-		return
-	}
-
+func DeleteKeys(awsConfig *keymanager.AWSConfig, userId string) {
 	// Initiate KeyManager
-	manager := keymanager.NewKeyManager(userId, "", &keymanager.AWSConfig{
-		Region:                stackInfo.Region,
-		APIGatewayId:          stackInfo.ApiGatewayRestApi,
-		APIGatewayStage:       stackInfo.Stage,
-		APIGatewayUsagePlanId: stackInfo.ApiGatewayUsagePlan,
-		CognitoUserPoolId:     stackInfo.CognitoUserPool,
-	})
+	manager := keymanager.NewKeyManager(userId, "", awsConfig)
 
-	err = manager.DeleteUserKeys()
+	err := manager.DeleteUserKeys()
 	if err != nil {
 		logger.Fatalw("Failed to delete API keys", `user`, manager.UserId)
 		fmt.Println(Red("Failed"))

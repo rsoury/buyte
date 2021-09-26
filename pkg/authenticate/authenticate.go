@@ -15,9 +15,9 @@ import (
 )
 
 type AWSConfig struct {
-	Region            string `env:"AWS_REGION"`
-	CognitoUserPoolId string `env:"COGNITO_USER_POOL_ID"`
-	CognitoClientId   string `env:"COGNITO_CLIENT_ID"`
+	Region            string `env:"AWS_REGION" envDefault:"ap-southeast-2"`
+	CognitoUserPoolId string `env:"COGNITO_USERPOOLID"`
+	CognitoClientId   string `env:"COGNITO_CLIENTID"`
 }
 
 type User struct {

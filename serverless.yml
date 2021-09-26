@@ -1,6 +1,6 @@
 service: buyte
 
-frameworkVersion: ">=1.28.0 <2.0.0"
+frameworkVersion: ">=2.0.0 <=3.0.0"
 
 provider:
   name: aws
@@ -10,6 +10,16 @@ provider:
   timeout: 30
   stage: ${opt:stage, 'dev'}
   versionFunctions: false
+  apiGateway:
+    shouldStartNameWithService: true
+    usagePlan:
+      quota:
+        limit: 10000000
+        offset: 1
+        period: MONTH
+      throttle:
+        burstLimit: 200
+        rateLimit: 100
 
 plugins:
   - serverless-pseudo-parameters
@@ -17,8 +27,7 @@ plugins:
   - serverless-go-build
   - serverless-scriptable-plugin
   - serverless-plugin-scripts
-  - serverless-dotenv
-  - serverless-offline
+  - serverless-dotenv-plugin
 
 package:
   individually: true
@@ -27,8 +36,21 @@ functions:
   api:
     handler: serverless/api/main.go
     environment:
-      COGNITO_USER_POOL_ID: ${env:COGNITO_USERPOOLID}
-      COGNITO_CLIENT_ID: ${env:COGNITO_CLIENTID}
+      COGNITO_USERPOOLID: ${env:COGNITO_USERPOOLID}
+      COGNITO_CLIENTID: ${env:COGNITO_CLIENTID}
+      STORAGE_ENDPOINT: ${env:STORAGE_ENDPOINT}
+      APPLE_MERCHANT_DOMAIN: ${env:APPLE_MERCHANT_DOMAIN}
+      SERVER_SENTRY: ${env:SERVER_SENTRY}
+      SERVER_PRODUCTION: ${env:SERVER_PRODUCTION, self:custom.serverProduction.${self:provider.stage}}
+      SERVER_LOG_CORS: ${env:SERVER_LOG_CORS}
+      FUNC_ADYEN_CSE: ${env:FUNC_ADYEN_CSE}
+      LOGGER_LEVEL: ${env:LOGGER_LEVEL,"info"}
+      LOGGER_DEV_MODE: ${env:LOGGER_DEV_MODE}
+      LOGGER_DISABLE_CALLER: ${env:LOGGER_DISABLE_CALLER}
+      STRIPE_LIVE_SECRET: ${env:STRIPE_LIVE_SECRET}
+      STRIPE_LIVE_PUBLIC: ${env:STRIPE_LIVE_PUBLIC}
+      STRIPE_TEST_SECRET: ${env:STRIPE_TEST_SECRET}
+      STRIPE_TEST_PUBLIC: ${env:STRIPE_TEST_PUBLIC}
     events:
       - http:
           path: '/'
@@ -38,11 +60,15 @@ functions:
           path: "/{proxy+}"
           method: ANY
           cors: true
+    package:
+      include:
+        - ./certs # Bin may run from within bin folder and therefore this should work.
   auth:
     handler: serverless/auth/main.go
     environment:
-      COGNITO_USER_POOL_ID: ${env:COGNITO_USERPOOLID}
-      COGNITO_CLIENT_ID: ${env:COGNITO_CLIENTID}
+      COGNITO_USERPOOLID: ${env:COGNITO_USERPOOLID}
+      COGNITO_CLIENTID: ${env:COGNITO_CLIENTID}
+    iamRoleStatementsName: ${self:service}-auth-role
     iamRoleStatements:
       - Effect: "Allow"
         Action:
@@ -54,18 +80,16 @@ functions:
         Resource: "*"
   define_auth_challenge:
     handler: serverless/cognito_triggers/define_auth_challenge/main.go
-    cognitoTrigger: DefineAuthChallenge
   create_auth_challenge:
     handler: serverless/cognito_triggers/create_auth_challenge/main.go
+    iamRoleStatementsName: ${self:service}-cognito-create-auth-challenge-role
     iamRoleStatements:
       - Effect: "Allow"
         Action:
           "apigateway:*"
         Resource: "*"
-    cognitoTrigger: CreateAuthChallenge
   verify_auth_challenge:
     handler: serverless/cognito_triggers/verify_auth_challenge/main.go
-    cognitoTrigger: VerifyAuthChallengeResponse
   post_confirmation:
     handler: serverless/cognito_triggers/post_confirmation/main.go
     environment:
@@ -75,7 +99,8 @@ functions:
       API_GATEWAY_STAGE: ${self:provider.stage}
       API_GATEWAY_USAGE_PLAN_ID:
         Ref: ApiGatewayUsagePlan
-      COGNITO_USER_POOL_ID: ${self:custom.cognito.${self:provider.stage}.userPoolId}
+      COGNITO_USERPOOLID: ${env:COGNITO_USERPOOLID}
+    iamRoleStatementsName: ${self:service}-cognito-post-confirmation-role
     iamRoleStatements:
       - Effect: "Allow"
         Action:
@@ -85,14 +110,13 @@ functions:
         Action:
           cognito-idp:*
         Resource: "*"
-    cognitoTrigger: PostConfirmation
 
   # Payment Gateway Utilities -- Called from Primary API
   adyen_cse:
     description: Use Headless Chrome Serverless for Adyen CSE
     memorySize: 1024
     timeout: 30
-    runtime: nodejs14.x
+    runtime: nodejs12.x
     handler: serverless/paymentgateway/adyen/handler.cse
     package:
       individually: true
@@ -117,10 +141,13 @@ resources:
 
 custom:
   version: ${file(./serverless/scripts/version.js)}
-  apiGatewayName: ${self:provider.stage}-${self:service}
+  apiGatewayName: ${self:service}-${self:provider.stage}
   scriptHooks:
     deploy:finalize: serverless/scripts/update-cognito-triggers.js
     remove:remove: serverless/scripts/remove-iam-roles.js
   scripts:
     commands:
       rm-roles: ./serverless/scripts/remove-iam-roles.js --stage ${self:provider.stage} --service ${self:service} --region ${self:provider.region}
+  serverProduction:
+    dev: false
+    prod: true

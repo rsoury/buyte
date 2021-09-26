@@ -62,3 +62,6 @@ yarn-error.log*
 # Certificates
 /certs/*.crt
 /certs/*.pem
+
+# StackInfo
+/*-stack-info.json
