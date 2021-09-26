@@ -7,9 +7,9 @@ if (typeof serverless === "undefined") {
 	serverless = {};
 }
 
-const region = _get(serverless, "service.provider.region", argv["region"]);
-const service = _get(serverless, "service.service", argv["service"]);
-const stage = _get(serverless, "service.provider.stage", argv["stage"]);
+const region = _get(serverless, "service.provider.region", argv.region);
+const service = _get(serverless, "service.service", argv.service);
+const stage = _get(serverless, "service.provider.stage", argv.stage);
 const name = _get(
 	serverless,
 	"service.custom.apiGatewayName",

@@ -8,12 +8,12 @@
 
 function getApplePaySession(url) {
 	return new Promise(function(resolve, reject) {
-		var xhr = new XMLHttpRequest();
+		const xhr = new XMLHttpRequest();
 		// xhr.open('POST', '/getApplePaySession');
 		xhr.open("POST", "/v1/public/applepay/session/");
 		xhr.onload = function() {
 			if (this.status >= 200 && this.status < 300) {
-				var json = {};
+				let json = {};
 				try {
 					json = JSON.parse(xhr.response);
 				} catch (e) {
@@ -39,6 +39,6 @@ function getApplePaySession(url) {
 			"Authorization",
 			"Bearer pk_YICkLIG2LPQfZvM3YE00LSDtXIQ5KvYfAPGiYSKkYPNyAPM2Xw9l"
 		);
-		xhr.send(JSON.stringify({ url: url }));
+		xhr.send(JSON.stringify({ url }));
 	});
 }

@@ -76,7 +76,7 @@ function applePayButtonClicked() {
 
 		total: {
 			label: "Apple Pay Example",
-			amount: "" + totalAmountFloat
+			amount: `${totalAmountFloat}`
 		},
 
 		supportedNetworks: ["amex", "discover", "masterCard", "visa"],
@@ -93,7 +93,7 @@ function applePayButtonClicked() {
 	 */
 	session.onvalidatemerchant = event => {
 		console.log("Validate merchant");
-		const validationURL = event.validationURL;
+		const { validationURL } = event;
 		console.log(event);
 		getApplePaySession(event.validationURL).then(function(response) {
 			console.log(response);
@@ -112,8 +112,8 @@ function applePayButtonClicked() {
 			event.shippingMethod.identifier === "free" ? "0.00" : "0.49";
 		const totalCost =
 			event.shippingMethod.identifier === "free"
-				? totalAmountFloat + ""
-				: totalAmountFloat + 0.5 + "";
+				? `${totalAmountFloat}`
+				: `${totalAmountFloat + 0.5}`;
 
 		const lineItems = [
 			{
@@ -153,7 +153,7 @@ function applePayButtonClicked() {
 			rawPaymentRequest: paymentRequest
 		};
 		console.log(event);
-		var r = new XMLHttpRequest();
+		const r = new XMLHttpRequest();
 		r.open("POST", "/v1/public/applepay/process/");
 		r.onreadystatechange = function() {
 			if (r.readyState != 4) {
