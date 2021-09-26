@@ -1,0 +1,61 @@
+# Golang Ignores
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, build with `go test -c`
+*.test
+/.test_temp
+/coverage
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Production
+bin/
+build/
+tmp/
+
+# Dependecies
+.glide/
+Gopkg.lock
+vendor/
+/node_modules
+/flow-typed
+/.pnp
+.pnp.js
+
+# Misc
+.DS_Store
+.idea
+*.swp
+.env
+.env.*
+!.env.example
+.vscode
+partner*
+mocks
+bindata.go
+
+
+# Don't include the dev resources
+.air
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Serverless directories
+.serverless
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+
+# Amplify
+/amplify
+!/amplify/.gitkeep
+!/amplify/.gitignore

@@ -1,0 +1,156 @@
+type Checkout @model @auth(rules: [{ allow: owner }]) @versioned {
+	id: ID!
+	label: String!
+	description: String
+	connection: ProviderConnection!
+		@connection(name: "CheckoutProviderConnection")
+	paymentOptions: [CheckoutPaymentOption!]!
+		@connection(name: "CheckoutPayments")
+	isArchived: Boolean!
+}
+type CheckoutPaymentOption
+	@model(queries: null)
+	@auth(rules: [{ allow: owner }]) {
+	id: ID!
+	checkout: Checkout! @connection(name: "CheckoutPayments")
+	paymentOption: MobileWebPayment! @connection(name: "PaymentsByCheckout")
+}
+
+# Users have to be in the SuperUsers group to mutate.
+type PaymentProvider
+	@model
+	@auth(
+		rules: [
+			{
+				allow: groups
+				groups: ["SuperUsers"]
+				queries: null
+				mutations: [create, update, delete]
+			}
+		]
+	)
+	@versioned {
+	id: ID!
+	name: String!
+	image: String!
+	paymentOptions: [ProviderPaymentOption!]!
+		@connection(name: "ProviderPayments")
+	connections: [ProviderConnection]! @connection(name: "Connection")
+}
+# Creating a model specifically to correlate many-to-many model connections.
+type ProviderPaymentOption
+	@model(queries: null)
+	@auth(
+		rules: [
+			{
+				allow: groups
+				groups: ["SuperUsers"]
+				queries: null
+				mutations: [create, update, delete]
+			}
+		]
+	) {
+	id: ID!
+	provider: PaymentProvider! @connection(name: "ProviderPayments")
+	paymentOption: MobileWebPayment! @connection(name: "PaymentsByProvider")
+}
+
+type MobileWebPayment
+	@model
+	@auth(
+		rules: [
+			{
+				allow: groups
+				groups: ["SuperUsers"]
+				queries: null
+				mutations: [create, update, delete]
+			}
+		]
+	)
+	@versioned {
+	id: ID!
+	name: String!
+	image: String!
+	checkouts: [CheckoutPaymentOption] @connection(name: "PaymentsByCheckout")
+	providers: [ProviderPaymentOption] @connection(name: "PaymentsByProvider")
+}
+
+type ProviderConnection @model(queries: null) @auth(rules: [{ allow: owner }]) {
+	id: ID!
+	isTest: Boolean!
+	provider: PaymentProvider! @connection(name: "Connection")
+	checkouts: [Checkout!]! @connection(name: "CheckoutProviderConnection")
+	type: String!
+	credentials: AWSJSON!
+}
+
+# A way for the widget to push and store the whole shipping method.
+type SelectedShippingMethod {
+	reference: String
+	label: String
+	description: String
+	rate: Int
+	minOrderPrice: Int
+	maxOrderPrice: Int
+}
+
+# A way to track where each payment token originates and it's currency at inception
+type PaymentToken @model @auth(rules: [{ allow: owner }]) {
+	id: ID!
+	value: AWSJSON!
+	checkout: Checkout! @connection
+	paymentMethod: MobileWebPayment! @connection
+	shippingMethod: PriceRate @connection
+	selectedShippingMethod: SelectedShippingMethod
+	amount: Int!
+	currency: String!
+	country: String!
+	rawPaymentRequest: String
+	charges: [Charge]! @connection(name: "ChargeAgainstPayment")
+}
+
+type Charge @model @auth(rules: [{ allow: owner }]) {
+	id: ID!
+	source: PaymentToken! @connection(name: "ChargeAgainstPayment")
+	amount: Int!
+	feeAmount: Int
+	currency: String!
+	captured: Boolean!
+	description: String
+	metadata: AWSJSON
+	providerCharge: ProviderCharge!
+	customer: Customer
+	order: Order
+	createdAt: AWSDateTime!
+}
+type Customer {
+	name: String
+	givenName:  String
+	familyName: String
+	emailAddress: String
+	phoneNumber: String
+	shippingAddress: CutomerAddress
+	billingAddress: CutomerAddress
+}
+type CutomerAddress {
+	addressLines: [String]
+	administrativeArea: String
+	country: String
+	countryCode: String
+	locality: String
+	postalCode: String
+	subAdministrativeArea: String
+	subLocality: String
+}
+type ProviderCharge {
+	reference: String!
+	type: String!
+}
+# Just a store of data that can help us build a better service. -- This doesn't even need to be documented.
+type Order {
+	reference: String
+	platform: String
+	items: AWSJSON
+	shipping: AWSJSON
+	customer: AWSJSON
+}

@@ -1,0 +1,201 @@
+# In case you decide to deploy the Binary onto a regular node/environment, there is a configuration here to deploy an API Gateway.
+
+Resources:
+  ApiGatewayRestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: ${self:custom.apiGatewayName}
+      Description: 'Buyte Primary API Gateway'
+  ApiGatewayAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: "BuyteAuthorizer"
+      RestApiId:
+        Ref: ApiGatewayRestApi
+      Type: REQUEST
+      AuthorizerUri:
+        Fn::Join:
+          - ""
+          -
+            - "arn:aws:apigateway:"
+            - Ref: "AWS::Region"
+            - ":lambda:path/2015-03-31/functions/"
+            - Fn::GetAtt:
+                - "AuthLambdaFunction"
+                - "Arn"
+            - "/invocations"
+      IdentitySource: 'method.request.header.Authorization'
+  # Give Api Gateway permission to Invoke Lambda function as Authorizer
+  ApiAuthLambdaPermission:
+    DependsOn: ApiGatewayRestApi
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName:
+        Fn::GetAtt:
+          - AuthLambdaFunction
+          - Arn
+      Principal: "apigateway.amazonaws.com"
+      SourceArn:
+        Fn::Join:
+          - ""
+          -
+            - "arn:aws:execute-api:#{AWS::Region}:#{AWS::AccountId}:"
+            - Ref: ApiGatewayRestApi
+            - "/authorizers/*"
+  ProxyResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Fn::GetAtt:
+          - ApiGatewayRestApi # our default Rest API logical ID
+          - RootResourceId
+      PathPart: '{proxy+}' # the endpoint in your API that is set as proxy -- versioned too
+      RestApiId:
+        Ref: ApiGatewayRestApi
+  ProxyMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      # Api Key not explicitly required, but Authorizer requires it...
+      ApiKeyRequired: false # true
+      AuthorizationType: CUSTOM
+      AuthorizerId:
+        Ref: ApiGatewayAuthorizer
+      ResourceId:
+        Ref: ProxyResource
+      RestApiId:
+        Ref: ApiGatewayRestApi
+      HttpMethod: ANY
+      Integration:
+        IntegrationHttpMethod: ANY
+        Type: HTTP_PROXY
+        Uri: ${self:custom.lb.${opt:stage, self:provider.stage}.url}/{proxy}
+        PassthroughBehavior: WHEN_NO_MATCH
+        RequestParameters:
+          'integration.request.path.proxy': 'method.request.path.proxy'
+          'integration.request.header.UserId': 'context.authorizer.userId'
+          'integration.request.header.Token': 'context.authorizer.token'
+          'integration.request.header.BareToken': 'context.authorizer.bareToken'
+          'integration.request.header.IsPublic': 'context.authorizer.isPublic'
+          'integration.request.header.IsAuthenticated': 'context.authorizer.isAuthenticated'
+          'integration.request.header.UserAttributes': 'context.authorizer.userAttributes'
+          'integration.request.header.AccessToken': 'context.authorizer.accessToken'
+        ConnectionType: VPC_LINK
+        ConnectionId: ${self:custom.lb.${opt:stage, self:provider.stage}.vpclink}
+      MethodResponses:
+        - StatusCode: 200
+      RequestParameters:
+        'method.request.path.proxy': true
+        'method.request.header.UserId': true
+        'method.request.header.Token': true
+        'method.request.header.BareToken': true
+        'method.request.header.IsPublic': true
+        'method.request.header.IsAuthenticated': true
+        'method.request.header.UserAttributes': true
+        'method.request.header.AccessToken': true
+  ApiGatewayStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId:
+        Ref: ApiGatewayRestApi
+      DeploymentId:
+        Ref: ApiGatewayDeploy
+      StageName: ${self:provider.stage}
+      Description: 'Used to version the Buyte API Gateway'
+      MethodSettings:
+        - DataTraceEnabled: true
+          HttpMethod: "*"
+          LoggingLevel: INFO
+          ResourcePath: "/*"
+          MetricsEnabled: true
+  ApiGatewayUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+      ApiStages:
+        - ApiId:
+            Ref: ApiGatewayRestApi
+          Stage:
+            Ref: ApiGatewayStage
+      Description: "Buyte's Free Teir on API Gateway. Enables reasonable usage."
+      UsagePlanName: "Free"
+      Quota:
+        Limit: 10000
+        Period: MONTH
+      Throttle:
+        BurstLimit: 10
+        RateLimit: 5
+  ApiGatewayDeploy:
+    DependsOn: "ProxyMethod"
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      Description: Buyte API Gateway Depoloyment
+      RestApiId:
+        Ref: ApiGatewayRestApi
+  PublicBaseResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Fn::GetAtt:
+          - ApiGatewayRestApi
+          - RootResourceId
+      PathPart: 'v${self:custom.version}'
+      RestApiId:
+        Ref: ApiGatewayRestApi
+  PublicPart2Resource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Ref: PublicBaseResource
+      PathPart: 'public'
+      RestApiId:
+        Ref: ApiGatewayRestApi
+  PublicResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Ref: PublicPart2Resource
+      PathPart: '{proxy+}'
+      RestApiId:
+        Ref: ApiGatewayRestApi
+  PublicOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      ResourceId:
+        Ref: PublicResource
+      RestApiId:
+        Ref: ApiGatewayRestApi
+      Integration:
+        IntegrationResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: "'Accept,Authorization,Content-Type,X-CSRF-Token,Referer,User-Agent,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+            method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+            method.response.header.Access-Control-Allow-Origin: "'*'"
+          ResponseTemplates:
+            application/json: ''
+        PassthroughBehavior: WHEN_NO_MATCH
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        Type: MOCK
+      MethodResponses:
+      - StatusCode: 200
+        ResponseModels:
+          application/json: 'Empty'
+        ResponseParameters:
+          method.response.header.Access-Control-Allow-Headers: false
+          method.response.header.Access-Control-Allow-Methods: false
+          method.response.header.Access-Control-Allow-Origin: false
+Outputs:
+  Stage:
+    Value: ${self:provider.stage}
+  Region:
+    Value: "#{AWS::Region}"
+  ApiGatewayRestApi:
+    Value:
+      Ref: ApiGatewayRestApi
+  ApiGatewayUsagePlan:
+    Value:
+      Ref: ApiGatewayUsagePlan

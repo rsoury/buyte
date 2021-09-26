@@ -1,0 +1,12 @@
+{
+	"CN": "merchant.com.buytecheckout",
+	"key": {
+		"algo": "ecdsa",
+		"size": 256
+	},
+	"names": [
+		{
+			"emailAddress": "ryan@buytecheckout.com"
+		}
+	]
+}

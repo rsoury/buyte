@@ -1,0 +1,159 @@
+@import url('https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,600,700,900&display=swap');
+
+html, body {
+    background-color: rgb(240, 240, 240);
+    font-family: "Nunito Sans", -apple-system, BlinkMacSystemFont,
+		"Helvetica Neue", "Helvetica", "Arial", sans-serif;
+}
+.background-customizable{
+    background-color: #fff;
+    border: 3px solid #111;
+    border-radius: 4px;
+    box-shadow: 10px 10px 0 #111;
+    -webkit-box-shadow: 10px 10px 0 #111;
+    max-width: 400px !important;
+}
+.background-customizable .panel-right-border {
+    padding-left: 5px;
+    padding-right: 25px;
+}
+.background-customizable .panel-left-border {
+    padding-left: 25px;
+    padding-right: 5px;
+}
+.background-customizable .span-or.background-customizable {
+    padding: 0px 15px;
+    background-color: #fff;
+    box-shadow: none;
+    border: none;
+    color: rgba(0, 0, 0, 0.25);
+}
+.background-customizable .span-or-verical.background-customizable {
+    background-color: #fff;
+    box-shadow: none;
+    border: none;
+    padding: 10px 2px;
+    color: rgba(0, 0, 0, 0.25);
+    margin-left: -35px;
+}
+.banner-customizable{
+    padding: 30px 0;
+    background-color: #fff;
+    margin: 0 0 10px 0;
+    border-bottom: 3px solid #111 !important;
+}
+.errorMessage-customizable{
+    padding: 0;
+    font-size: 12px;
+    width: 100%;
+    background: #fff;
+    border: 0;
+    color: #ff4e4e;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 900;
+}
+.idpButton-customizable{
+    height: 40px;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 15px;
+    color: #fff;
+    background-color: #5bc0de;
+    border-color: #46b8da;
+}
+.idpButton-customizable:hover{
+    color: #fff;
+    background-color: #31b0d5;
+}
+.inputField-customizable{
+    width: 100%;
+    height: 45px;
+    color: #333;
+    background-color: #fff;
+    border: 3px solid #3f51b5;
+    margin-bottom: 20px;
+    outline: 0;
+    box-shadow: 3px 3px !important;
+    -webkit-box-shadow: 3px 3px !important;
+    font-size: 14px;
+}
+.inputField-customizable:focus{
+    border-color: #7586e6
+}
+.label-customizable{
+    font-weight: 900;
+    color: #111;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 12px;
+    margin-bottom: 2.5px;
+}
+.legalText-customizable{
+    color: #747474;
+    font-size: 11px;
+}
+.logo-customizable{
+    max-width: 150px;
+    max-height: 30%;
+}
+.submitButton-customizable{
+    font-size: 14px;
+    font-weight: bold;
+    margin: 40px 0 10px 0;
+    height: 45px;
+    width: 100%;
+    color: #fff;
+    background-color: #3f51b5;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: background-color 0.25s;
+    outline: 0 !important;
+}
+.submitButton-customizable:hover{
+    color: #fff;
+    background-color: #344395;
+}
+.idpDescription-customizable, .textDescription-customizable{
+    padding-top: 0;
+    padding-bottom: 10px;
+    display: block;
+    font-size: 20px;
+}
+.socialButton-customizable {
+    height: 50px;
+    background-color: #fff;
+    border-radius: 4px;
+    border: 2px solid rgb(240, 240, 240);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    outline: 0 !important;
+    transition: background-color 0.25s;
+    box-shadow: none !important;
+}
+.socialButton-customizable:hover{
+    cursor: pointer;
+    background-color: rgb(240, 240, 240);
+}
+.socialButton-customizable > span:nth-child(1) {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    padding-left: 10px;
+    background-color: rgb(240, 240, 240);
+    transition: background-color 0.25s;
+}
+.socialButton-customizable > span:nth-child(2) {
+    padding-left: 40px;
+}
+.socialButton-customizable:active {
+    background-color: rgb(230, 230, 230) !important;
+}
+.socialButton-customizable:active > span:nth-child(1) {
+    background-color: rgb(230, 230, 230) !important;
+}

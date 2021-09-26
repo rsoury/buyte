@@ -1,0 +1,44 @@
+Resources:
+  PostUnderscoreconfirmationCognitoUserPoolTriggerPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:invokeFunction
+      Principal: cognito-idp.amazonaws.com
+      FunctionName:
+        Fn::GetAtt:
+          - PostUnderscoreconfirmationLambdaFunction
+          - Arn
+      SourceArn: arn:aws:cognito-idp:#{AWS::Region}:#{AWS::AccountId}:userpool/*
+  DefineUnderscoreauthUnderscorechallengeCognitoUserPoolTriggerPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:invokeFunction
+      Principal: cognito-idp.amazonaws.com
+      FunctionName:
+        Fn::GetAtt:
+          - DefineUnderscoreauthUnderscorechallengeLambdaFunction
+          - Arn
+      SourceArn: arn:aws:cognito-idp:#{AWS::Region}:#{AWS::AccountId}:userpool/*
+  CreateUnderscoreauthUnderscorechallengeCognitoUserPoolTriggerPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:invokeFunction
+      Principal: cognito-idp.amazonaws.com
+      FunctionName:
+        Fn::GetAtt:
+          - CreateUnderscoreauthUnderscorechallengeLambdaFunction
+          - Arn
+      SourceArn: arn:aws:cognito-idp:#{AWS::Region}:#{AWS::AccountId}:userpool/*
+  VerifyUnderscoreauthUnderscorechallengeCognitoUserPoolTriggerPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:invokeFunction
+      Principal: cognito-idp.amazonaws.com
+      FunctionName:
+        Fn::GetAtt:
+          - VerifyUnderscoreauthUnderscorechallengeLambdaFunction
+          - Arn
+      SourceArn: arn:aws:cognito-idp:#{AWS::Region}:#{AWS::AccountId}:userpool/*
+Outputs:
+  CognitoUserPool:
+    Value: ${self:custom.cognito.${self:provider.stage}.userPoolId}

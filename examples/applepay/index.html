@@ -1,0 +1,37 @@
+<!--
+Copyright (C) 2016 Apple Inc. All Rights Reserved.
+See LICENSE.txt for this sample’s licensing information
+
+Abstract:
+An example page that displays an Apple Pay button and triggers a payment request if clicked
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/dev/applepay/style.css">
+    <link rel="apple-touch-icon" sizes="120x120" href="/dev/applepay/touch-icon-120.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/dev/applepay/touch-icon-152.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="/dev/applepay/touch-icon-167.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/dev/applepay/touch-icon-180.png">
+    <title>Apple Pay Example</title>
+</head>
+
+<body>
+    <div class="apple-pay">
+        <h2> Buy with 🍎&nbsp;Pay </h2>
+        <p>
+            This is a very simple example site that demonstrates Apple&nbsp;Pay on the web.
+        </p>
+        <p>
+            Compatible browsers will display an Apple&nbsp;Pay button below.
+        </p>
+        <div class="apple-pay-button" id="apple-pay-button"></div>
+
+        <script src="/dev/applepay/index.js?version=1.0.0"></script>
+        <script src="/dev/applepay/support.js?version=1.0.0"></script>
+    </div>
+</body>
+</html>

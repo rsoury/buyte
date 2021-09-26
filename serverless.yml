@@ -1,0 +1,117 @@
+service: buyte
+
+frameworkVersion: ">=1.28.0 <2.0.0"
+
+provider:
+  name: aws
+  runtime: go1.x
+  region: ${opt:region, 'ap-southeast-2'}
+  memorySize: 128
+  timeout: 30
+  stage: ${opt:stage, 'dev'}
+  versionFunctions: false
+
+plugins:
+  - serverless-pseudo-parameters
+  - serverless-iam-roles-per-function
+  - serverless-go-build
+  - serverless-scriptable-plugin
+  - serverless-plugin-scripts
+  - serverless-dotenv
+  - serverless-offline
+
+package:
+  individually: true
+
+functions:
+  api:
+    handler: serverless/api/main.go
+    environment:
+      COGNITO_USER_POOL_ID: ${env:COGNITO_USERPOOLID}
+      COGNITO_CLIENT_ID: ${env:COGNITO_CLIENTID}
+  auth:
+    handler: serverless/auth/main.go
+    environment:
+      COGNITO_USER_POOL_ID: ${env:COGNITO_USERPOOLID}
+      COGNITO_CLIENT_ID: ${env:COGNITO_CLIENTID}
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          "apigateway:*"
+        Resource: "*"
+      - Effect: "Allow"
+        Action:
+          cognito-idp:*
+        Resource: "*"
+  define_auth_challenge:
+    handler: serverless/cognito_triggers/define_auth_challenge/main.go
+    cognitoTrigger: DefineAuthChallenge
+  create_auth_challenge:
+    handler: serverless/cognito_triggers/create_auth_challenge/main.go
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          "apigateway:*"
+        Resource: "*"
+    cognitoTrigger: CreateAuthChallenge
+  verify_auth_challenge:
+    handler: serverless/cognito_triggers/verify_auth_challenge/main.go
+    cognitoTrigger: VerifyAuthChallengeResponse
+  post_confirmation:
+    handler: serverless/cognito_triggers/post_confirmation/main.go
+    environment:
+      API_GATEWAY_NAME: ${self:custom.apiGatewayName}
+      API_GATEWAY_ID:
+        Ref: ApiGatewayRestApi
+      API_GATEWAY_STAGE: ${self:provider.stage}
+      API_GATEWAY_USAGE_PLAN_ID:
+        Ref: ApiGatewayUsagePlan
+      COGNITO_USER_POOL_ID: ${self:custom.cognito.${self:provider.stage}.userPoolId}
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          "apigateway:*"
+        Resource: "*"
+      - Effect: "Allow"
+        Action:
+          cognito-idp:*
+        Resource: "*"
+    cognitoTrigger: PostConfirmation
+
+  # Payment Gateway Utilities -- Called from Primary API
+  adyen_cse:
+    description: Use Headless Chrome Serverless for Adyen CSE
+    memorySize: 1024
+    timeout: 30
+    runtime: nodejs8.10
+    handler: serverless/paymentgateway/adyen/handler.cse
+    package:
+      individually: true
+      exclude:
+        - ./**
+      include:
+        - ./serverless/paymentgateway/adyen/**
+        - ./node_modules/adyen-cse-web/**
+        - ./node_modules/@serverless-chrome/lambda/**
+        - ./node_modules/chrome-remote-interface/**
+        - ./node_modules/commander/**
+        - ./node_modules/ws/**
+        - ./node_modules/async-limiter/**
+    environment:
+      PAGE_LOAD_TIMEOUT: 20000
+
+resources:
+  # API Gateway
+  # - ${file(./serverless/resources/apigateway.yml)}
+  - ${file(./serverless/resources/cognito.yml)}
+
+
+custom:
+  version: ${file(./serverless/scripts/version.js)}
+  apiGatewayName: ${self:provider.stage}-${self:service}
+  scriptHooks:
+    deploy:finalize: serverless/scripts/update-cognito-triggers.js
+    remove:remove: serverless/scripts/remove-iam-roles.js
+  scripts:
+    commands:
+      rm-roles: ./serverless/scripts/remove-iam-roles.js --stage ${self:provider.stage} --service ${self:service} --region ${self:provider.region}

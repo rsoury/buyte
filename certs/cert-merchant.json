@@ -1,0 +1,13 @@
+{
+	"hosts": ["go.buytecheckout.com", "buytecheckout.com"],
+	"key": {
+		"algo": "rsa",
+		"size": 2048
+	},
+	"CN": "buytecheckout.com",
+	"names": [
+		{
+			"emailAddress": "ryan@buytecheckout.com"
+		}
+	]
+}

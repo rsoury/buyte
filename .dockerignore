@@ -1,0 +1,8 @@
+.DS_Store
+/node_modules
+.git
+.gitattributes
+.gitignore
+/.serverless
+.env.*
+.env*
