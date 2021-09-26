@@ -55,9 +55,8 @@ Once this codebase has been set up, please visit:
    `amplify push`
    Ensure you auto-generate code from GraphQL schema when prompted.
 5. Add the GraphQL Endpoint to your Environment file `.env.development` or `.env.production`
-6. Add Cognito data from the produced AWS configuration to your Environment file(s).
 
-### 2. Set up your ApplePay Certificates
+### 2. ApplePay Certificates
 
 [Visit the Certs directory](https://github.com/rsoury/buyte/blob/master/certs/) and follow the guide to produce your Apple Pay Certificates
 
@@ -78,8 +77,13 @@ For development, use `sls offline` to test requests to a locally hosted web serv
 
 ### 5. Finalise Cognito
 
-Go to your AWS Console and visit the Cognito Portal.  
-Then, add the Serverless Lambda Functions as the Cognito Triggers.
+Go to your AWS Console and visit the Cognito Portal.
+
+1. Add the Serverless Lambda Functions as the Cognito Triggers.
+2. Add a Domain Name to your Hosted UI
+3. Update your `COGNITO_CLIENTID` and `COGNITO_USERPOOLID` your Environment file(s).
+
+Further configuration for Cognito will continue in the [Buyte Dashboard](https://github.com/rsoury/buyte-dashboard) set up.
 
 ## Testing
 
