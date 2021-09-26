@@ -3,7 +3,7 @@
 **Open Source Digital Wallet Checkout**.  
 Accelerate your eCommerce website checkout with an all-in-one solution that integrates Apple Pay and Google Pay in with your own Payment Processor. Completely serverless tokenisation and payment processing for digital wallet solutions built for the AWS Cloud.
 
-![Buyte Logo](https://github.com/rsoury/buyte/blob/master/scripts/cognito/logo.png)
+![Buyte Logo](https://github.com/rsoury/buyte/blob/master/logo.png)
 
 [See a demo on YouTube](https://www.youtube.com/watch?v=fKnVh8_HLwk)  
 [See some example images of the application](https://github.com/rsoury/buyte/blob/master/examples/images/)
@@ -58,8 +58,7 @@ For development, use `sls offline` to test requests to a locally hosted web serv
 
 ## Requirements
 
-- Go 1.9.1+
-- CFSSL: `go get -u github.com/cloudflare/cfssl/cmd/...`
+- Go 1.16.0+
 
 ## Testing
 

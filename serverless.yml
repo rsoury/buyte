@@ -83,7 +83,7 @@ functions:
     description: Use Headless Chrome Serverless for Adyen CSE
     memorySize: 1024
     timeout: 30
-    runtime: nodejs8.10
+    runtime: nodejs14.x
     handler: serverless/paymentgateway/adyen/handler.cse
     package:
       individually: true
