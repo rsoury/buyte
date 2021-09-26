@@ -1,4 +1,4 @@
-# Buyte
+# Buyte - WIP
 
 **Open Source Digital Wallet Checkout**.  
 Accelerate your eCommerce website checkout with an all-in-one solution that integrates Apple Pay and Google Pay with your Payment Processor(s). Completely serverless tokenisation and payment processing for digital wallet solutions built for the AWS Cloud.
