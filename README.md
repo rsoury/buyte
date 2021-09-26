@@ -18,6 +18,19 @@ The produced Binary is a CLI tool capable of running commands for administrative
 
 ![Buyte Architecture](https://github.com/rsoury/buyte/blob/master/docs/Buyte-Architecture.jpeg)
 
+## Requirements
+
+- Go 1.16.0+
+
+## Supporting Repositories
+
+Once this codebase has been set up, please visit:
+
+- [Buyte Dashboard](https://github.com/rsoury/buyte-dashboard)
+  - Set up the Administration Portal where Checkouts can be created and connected to different Payment Processors.
+- [Buyte Checkout](https://github.com/rsoury/buyte-checkout)
+  - Configure and then install the Buyte Checkout JS library into your website referencing the Checkout ID produced in your Buyte Dashboard.
+
 ## Getting Started
 
 1. Clone the repository `git clone git@github.com:rsoury/buyte.git`
@@ -42,8 +55,13 @@ The produced Binary is a CLI tool capable of running commands for administrative
    `amplify push`
    Ensure you auto-generate code from GraphQL schema when prompted.
 5. Add the GraphQL Endpoint to your Environment file `.env.development` or `.env.production`
+6. Add Cognito data from the produced AWS configuration to your Environment file(s).
 
-### 2. CLI
+### 2. Set up your ApplePay Certificates
+
+[Visit the Certs directory](https://github.com/rsoury/buyte/blob/master/certs/) and follow the guide to produce your Apple Pay Certificates
+
+### 3. CLI
 
 1. Install Golang dependencies - `go mod download`
 2. Build the binary - `make`
@@ -52,25 +70,22 @@ The produced Binary is a CLI tool capable of running commands for administrative
 
 For development, use `make init && make watch` to rebuild the binary on file change.
 
-### 3. Serverless
+### 4. Serverless
 
 1. Deploy to AWS - `sls deploy`
 
 For development, use `sls offline` to test requests to a locally hosted web server.
 
-## Requirements
+### 5. Finalise Cognito
 
-- Go 1.16.0+
+Go to your AWS Console and visit the Cognito Portal.  
+Then, add the Serverless Lambda Functions as the Cognito Triggers.
 
 ## Testing
 
 ```shell
 go test -v
 ```
-
-## ApplePay Certificates
-
-[Visit the Certs directory](https://github.com/rsoury/buyte/blob/master/certs/) and follow the guide to produce your Apple Pay Certificates
 
 ## Caveats
 

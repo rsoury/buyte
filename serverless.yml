@@ -29,6 +29,15 @@ functions:
     environment:
       COGNITO_USER_POOL_ID: ${env:COGNITO_USERPOOLID}
       COGNITO_CLIENT_ID: ${env:COGNITO_CLIENTID}
+    events:
+      - http:
+          path: '/'
+          method: ANY
+          cors: true
+      - http:
+          path: "/{proxy+}"
+          method: ANY
+          cors: true
   auth:
     handler: serverless/auth/main.go
     environment:
