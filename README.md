@@ -153,8 +153,8 @@ go test -v
 
 - [ApplePay](https://github.com/rsoury/applepay/) dependency has some caveats:
   - You may need to change your `PKG_CONFIG_PATH` to include OpenSSL. For example, on my Mac I use `PKG_CONFIG_PATH=$(brew --prefix openssl)/lib/pkgconfig go test`.
-  - After Serverless Deploy, go to AWS Cognito in AWS console and save the Cognito Triggers page.  
-  **There is a bug here where without saving manually, they will not run when required.**
+- After Serverless Deploy, go to AWS Cognito in AWS console and save the Cognito Triggers page.  
+   **There is a bug here where without saving manually, they will not run when required.**
 
 ## Development Endpoints
 
