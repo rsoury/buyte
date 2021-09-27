@@ -24,7 +24,7 @@ COPY . .
 # COPY ./certs /certs
 COPY ./config.${BUILD_ENV}.yaml ./config.yaml
 
-# Set ENV variables for container
+# Set ENV variables for container TODO: Add Key passing to Docker.
 ENV APP_ENV = ${BUILD_ENV}
 ENV AWS_ACCESS_KEY_ID=""
 ENV AWS_SECRET_ACCESS_KEY=""
