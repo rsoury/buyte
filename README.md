@@ -9,6 +9,7 @@
 <div align="center">
   Accelerate your eCommerce website checkout with an enhanced digital wallet checkout solution. Integrate Apple Pay and Google Pay with your Payment Processor(s).
 </div>
+<br/>
 
 ![Buyte Banner](https://github.com/rsoury/buyte/blob/master/examples/images/banner-1544x500.jpg)
 
@@ -37,6 +38,9 @@
 - [Testing](#testing)
 - [Caveats](#caveats)
 - [Development Endpoints](#development-endpoints)
+- [Contribution](#contribution)
+- [Enterprise Support](#enterprise-support)
+- [Found this repo interesting?](#found-this-repo-interesting)
 
 ## Features
 
@@ -155,3 +159,15 @@ go test -v
 ## Development Endpoints
 
 Development endpoints were made to assist in spinning up a landing page with the appropriate digital wallet.
+
+## Contribution
+
+Simply fork this repo and make it your own, or create a pull request and we can build something awesome together!
+
+## Enterprise Support
+
+Looking to integrate a Legacy Payment Processor or Banking API? Contact us at [Web Doodle](https://www.webdoodle.com.au/?ref=github-buyte) to discuss tailored solutions.
+
+## Found this repo interesting?
+
+Feel free to follow me on [Github](https://github.com/rsoury) or [Twitter](https://twitter.com/@ryan_soury)
