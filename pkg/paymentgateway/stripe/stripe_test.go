@@ -9,11 +9,11 @@ import (
 )
 
 const credentials = `{
-	"accessToken": "sk_test_aTL8kCjcNuCUiUTLOiRKW6XV",
-	"refreshToken": "rt_EeCOPOdDolK43E4JIq3x9fC62HyuDkgaTWeDd7fetSAlexdR",
+	"accessToken": "sk_test_xxxx",
+	"refreshToken": "rt_xxxx",
 	"scope": "read_write",
-	"stripePublishableKey": "pk_test_uLptUrNCbh4hZuJQN9RSlmEO",
-	"stripeUserId": "acct_17ZtgcITpNO3y6fq",
+	"stripePublishableKey": "pk_test_xxx",
+	"stripeUserId": "acct_xxx",
 	"tokenType": "bearer"
 }`
 const networkTokenData = `{

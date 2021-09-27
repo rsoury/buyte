@@ -8,6 +8,21 @@ Accelerate your eCommerce website checkout with an all-in-one solution that inte
 [See a demo on YouTube](https://www.youtube.com/watch?v=fKnVh8_HLwk)  
 [See some example images of the application](https://github.com/rsoury/buyte/blob/master/examples/images/)
 
+## Features
+
+- Hosted 
+- Checkout for each 
+
+## Supported Digital Wallets
+
+- Apple Pay
+- Google Pay
+
+## Supported Payment Processors
+
+- Stripe
+- Adyen
+
 ## Overview
 
 This repository includes all core services (Serverless API, CLI, Scripts, and AWS Amplify Configuration).  
@@ -18,9 +33,10 @@ The produced Binary is a CLI tool capable of running commands for administrative
 
 ![Buyte Architecture](https://github.com/rsoury/buyte/blob/master/docs/Buyte-Architecture.jpeg)
 
-## Requirements
+## Installation Requirements
 
 - Go 1.16.0+
+- Node.js 10.0+
 
 ## Supporting Repositories
 

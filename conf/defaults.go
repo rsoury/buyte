@@ -35,7 +35,7 @@ func init() {
 	config.SetDefault("server.log_cors", false)
 	config.SetDefault("server.profiler_enabled", false)
 	config.SetDefault("server.profiler_path", "/debug")
-	config.SetDefault("server.sentry", "https://9aeaac06e5314058a35a8b7518b84569:82fe8735e9f445859dbe10520e39c1aa@sentry.io/1428799")
+	config.SetDefault("server.sentry", "")
 	config.SetDefault("server.mock.authorizer", true)
 
 	// Database Settings
