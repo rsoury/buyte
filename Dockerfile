@@ -22,9 +22,9 @@ RUN go get -u github.com/golang/dep/cmd/dep
 WORKDIR $GOPATH/src/buyte/
 COPY . .
 # COPY ./certs /certs
-COPY ./config.${BUILD_ENV}.yaml ./config.yaml
+# COPY ./config.${BUILD_ENV}.yaml ./config.yaml
 
-# Set ENV variables for container TODO: Add Key passing to Docker.
+# Set ENV variables for container
 ENV APP_ENV = ${BUILD_ENV}
 ENV AWS_ACCESS_KEY_ID=""
 ENV AWS_SECRET_ACCESS_KEY=""
@@ -43,4 +43,4 @@ RUN chmod -R +r ./certs
 EXPOSE 80
 
 # Run the API
-CMD ["./bin/buyte", "api", "-v", "-c", "./config.yaml"]
+CMD ["./bin/buyte", "api", "-v"]

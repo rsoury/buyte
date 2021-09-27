@@ -1,17 +1,50 @@
-# Buyte - WIP
+<div align="center">
+  <h1>Buyte - WIP</h1>
+</div>
 
-**Open Source Digital Wallet Checkout**.  
-Accelerate your eCommerce website checkout with an all-in-one solution that integrates Apple Pay and Google Pay with your Payment Processor(s). Completely serverless tokenisation and payment processing for digital wallet solutions built for the AWS Cloud.
+<div align="center">
+  <strong>Digital wallet checkout on a serverless stack</strong>
+</div>
 
-![Buyte Logo](https://github.com/rsoury/buyte/blob/master/docs/logo.png)
+<div align="center">
+  Accelerate your eCommerce website checkout with an enhanced digital wallet checkout solution. Integrate Apple Pay and Google Pay with your Payment Processor(s).
+</div>
 
-[See a demo on YouTube](https://www.youtube.com/watch?v=fKnVh8_HLwk)  
-[See some example images of the application](https://github.com/rsoury/buyte/blob/master/examples/images/)
+![Buyte Banner](https://github.com/rsoury/buyte/blob/master/examples/images/banner-1544x500.png)
+
+<div align="center">
+   <a href="https://www.youtube.com/watch?v=fKnVh8_HLwk">See a demo</a>
+   <span> | </span>
+   <a href="https://github.com/rsoury/buyte/blob/master/examples/images/">See example images</a>
+</div>
+
+## Table of Contents
+
+- [Table of Contents](#table-of-contents)
+- [Features](#features)
+- [Supported Digital Wallets](#supported-digital-wallets)
+- [Supported Payment Processors](#supported-payment-processors)
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Installation Requirements](#installation-requirements)
+- [Supporting Repositories](#supporting-repositories)
+- [Getting Started](#getting-started)
+  - [1. Amplify](#1-amplify)
+  - [2. ApplePay Certificates](#2-applepay-certificates)
+  - [3. Serverless](#3-serverless)
+  - [3. CLI](#3-cli)
+  - [5. Finalise Cognito](#5-finalise-cognito)
+- [Testing](#testing)
+- [Caveats](#caveats)
+- [Development Endpoints](#development-endpoints)
 
 ## Features
 
-- Hosted 
-- Checkout for each 
+- **Frictionless:** Skip passwords, account forms and the standard checkout flow. Minimise time to checkout, maximising conversions. 
+- **Familiar:** Allow your users to checkout using the same technology they use in-store.
+- **Secure:** Apple and Google's security infrastructure prevents card/payment details from leaving your user's devices.
+- **Widgetised:** Complete your checkout from anywhere on your website with the [Buyte Checkout](https://github.com/rsoury/buyte-checkout).
+- **Extensible:** Bring your Payment Processor and pass on raw/decrypted payment data.
 
 ## Supported Digital Wallets
 
