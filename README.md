@@ -10,7 +10,7 @@
   Accelerate your eCommerce website checkout with an enhanced digital wallet checkout solution. Integrate Apple Pay and Google Pay with your Payment Processor(s).
 </div>
 
-![Buyte Banner](https://github.com/rsoury/buyte/blob/master/examples/images/banner-1544x500.png)
+![Buyte Banner](https://github.com/rsoury/buyte/blob/master/examples/images/banner-1544x500.jpg)
 
 <div align="center">
    <a href="https://www.youtube.com/watch?v=fKnVh8_HLwk">See a demo</a>
@@ -45,6 +45,7 @@
 - **Secure:** Apple and Google's security infrastructure prevents card/payment details from leaving your user's devices.
 - **Widgetised:** Complete your checkout from anywhere on your website with the [Buyte Checkout](https://github.com/rsoury/buyte-checkout).
 - **Extensible:** Bring your Payment Processor and pass on raw/decrypted payment data.
+- **Serverless:** Scalable by default.
 
 ## Supported Digital Wallets
 
@@ -58,7 +59,9 @@
 
 ## Overview
 
-This repository includes all core services (Serverless API, CLI, Scripts, and AWS Amplify Configuration).  
+This repository responsible for tokenisation of digital wallet payloads before passing on raw/decrypted payment data to the connected Payment Processor.
+
+It is comprised of the Serverless API, CLI, Scripts, and AWS Amplify Configuration
 
 The produced Binary is a CLI tool capable of running commands for administrative and development purposes as well as a command for starting the Tokenisation and Payment Processing API.
 
