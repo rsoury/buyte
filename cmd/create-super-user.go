@@ -52,7 +52,7 @@ func init() {
 
 	envConfig := keymanager.NewEnvConfig()
 	createSuperUserCmd.PersistentFlags().StringP("region", "r", envConfig.Region, "The region of the environment.")
-	createSuperUserCmd.PersistentFlags().StringP("cognito-user-pool-id", "c", envConfig.CognitoUserPoolId, "The Cognito User Pool ID that the User belongs to.")
+	createSuperUserCmd.PersistentFlags().StringP("cognito-user-pool-id", "u", envConfig.CognitoUserPoolId, "The Cognito User Pool ID that the User belongs to.")
 
 	userEnvConfig := NewUserEnvConfig()
 	createSuperUserCmd.PersistentFlags().StringP("email", "e", userEnvConfig.Username, "The User Username/Email.")
@@ -69,12 +69,42 @@ func NewUserEnvConfig() *SuperUser {
 }
 
 func CreateSuperUser(awsConfig *keymanager.AWSConfig, email, password string) {
+	log.Print(awsConfig)
+
 	// Authenticate with Cognito
 	sess, _ := session.NewSession(
 		&aws.Config{Region: aws.String(awsConfig.Region)},
 	)
 	// Create an APIGateway client from a aws session
 	svc := cognito.New(sess)
+
+	// Check if group exist
+	groups, err := svc.ListGroups(&cognito.ListGroupsInput{
+		UserPoolId: &awsConfig.CognitoUserPoolId,
+		Limit: aws.Int64(50),
+	});
+	if err != nil {
+		log.Fatal(errors.Wrap(err, "Cannot fetch Groups"))
+	}
+	superUserGroupExists := false
+	for _, group := range groups.Groups {
+		if group.GroupName == aws.String("SuperUsers") {
+			superUserGroupExists = true
+			break
+		}
+	}
+
+	// If not, create it
+	if !superUserGroupExists {
+		_, err = svc.CreateGroup(&cognito.CreateGroupInput{
+			UserPoolId: &awsConfig.CognitoUserPoolId,
+			GroupName: aws.String("SuperUsers"),
+			Description: aws.String("A group of users who have Admin privileges."),
+		})
+		if err != nil {
+			log.Fatal(errors.Wrap(err, "Cannot create SuperUsers Groups"))
+		}
+	}
 
 	var attributes []*cognito.AttributeType
 	attributes = append(attributes, &cognito.AttributeType{
@@ -99,6 +129,14 @@ func CreateSuperUser(awsConfig *keymanager.AWSConfig, email, password string) {
 	})
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "Cannot add user to SuperUsers Group"))
+		_, err = svc.AdminDeleteUser(&cognito.AdminDeleteUserInput{
+			UserPoolId: &awsConfig.CognitoUserPoolId,
+			Username: newUser.User.Username,
+		});
+
+		if err != nil {
+			log.Fatal(errors.Wrap(err, "Cannot delete the user in error rollback"))
+		}
 	}
 
 	fmt.Println(Green("Super user created!"))

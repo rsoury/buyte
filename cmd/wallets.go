@@ -94,7 +94,7 @@ func init() {
 	walletsCmd.PersistentFlags().StringP("stage", "s", envConfig.APIGatewayStage, "The stage environment.")
 	walletsCmd.PersistentFlags().StringP("api-gateway-id", "a", envConfig.APIGatewayId, "The API Gateway ID to use.")
 	walletsCmd.PersistentFlags().StringP("api-gateway-usage-plan-id", "x", envConfig.APIGatewayUsagePlanId, "The API Gateway Usage Plan ID to associate the new API keys to.")
-	walletsCmd.PersistentFlags().StringP("cognito-user-pool-id", "c", envConfig.CognitoUserPoolId, "The Cognito User Pool ID that the User belongs to.")
+	walletsCmd.PersistentFlags().StringP("cognito-user-pool-id", "u", envConfig.CognitoUserPoolId, "The Cognito User Pool ID that the User belongs to.")
 
 	// Add "add" to "wallets"
 	walletsCmd.AddCommand(walletsAddCmd)
