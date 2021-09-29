@@ -3,10 +3,13 @@ package user
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"strconv"
 
 	"github.com/aws/aws-sdk-go/aws/session"
 	cognito "github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
+	"github.com/caarlos0/env"
+	"github.com/pkg/errors"
 	config "github.com/spf13/viper"
 
 	"go.uber.org/zap"
@@ -34,6 +37,20 @@ type UserAttributes struct {
 	FeeMultiplier  float64 `json:"custom:fee_multiplier,string"`
 	AccountBalance int     `json:"custom:account_balance,string"`
 	CustomCSS      string  `json:"custom:custom_css"`
+}
+
+type SuperUser struct {
+	Username string `env:"ADMIN_USERNAME"`
+	Password string `env:"ADMIN_PASSWORD"`
+}
+
+func NewSuperUserEnvConfig() *SuperUser {
+	config := &SuperUser{}
+	err := env.Parse(config)
+	if err != nil {
+		log.Fatal(errors.Wrap(err, "Cannot Marshal Environment into Config"))
+	}
+	return config
 }
 
 func Setup(get func(key string) string) (*User, error) {

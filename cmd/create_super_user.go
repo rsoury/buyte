@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/briandowns/spinner"
-	"github.com/caarlos0/env"
 	. "github.com/logrusorgru/aurora"
 	"github.com/pkg/errors"
 	cli "github.com/spf13/cobra"
@@ -15,13 +14,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	cognito "github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
 
-	"github.com/rsoury/buyte/pkg/keymanager"
+	"github.com/rsoury/buyte/buyte"
+	"github.com/rsoury/buyte/pkg/user"
 )
-
-type SuperUser struct {
-	Username string `env:"ADMIN_USERNAME"`
-	Password string `env:"ADMIN_PASSWORD"`
-}
 
 // createSuperUserCmd represents the create-super-user command
 var createSuperUserCmd = &cli.Command{
@@ -39,7 +34,7 @@ var createSuperUserCmd = &cli.Command{
 		cognitoUserPoolId, _ := cmd.Flags().GetString("cognito-user-pool-id")
 		region, _ := cmd.Flags().GetString("region")
 
-		CreateSuperUser(&keymanager.AWSConfig{
+		CreateSuperUser(&buyte.AWSConfig{
 			Region:            region,
 			CognitoUserPoolId: cognitoUserPoolId,
 		}, email, password)
@@ -50,27 +45,16 @@ func init() {
 	// Add "wallets" to "root"
 	rootCmd.AddCommand(createSuperUserCmd)
 
-	envConfig := keymanager.NewEnvConfig()
+	envConfig := buyte.NewEnvConfig()
 	createSuperUserCmd.PersistentFlags().StringP("region", "r", envConfig.Region, "The region of the environment.")
-	createSuperUserCmd.PersistentFlags().StringP("cognito-user-pool-id", "u", envConfig.CognitoUserPoolId, "The Cognito User Pool ID that the User belongs to.")
+	createSuperUserCmd.PersistentFlags().String("cognito-user-pool-id", envConfig.CognitoUserPoolId, "The Cognito User Pool ID that the User belongs to.")
 
-	userEnvConfig := NewUserEnvConfig()
+	userEnvConfig := user.NewSuperUserEnvConfig()
 	createSuperUserCmd.PersistentFlags().StringP("email", "e", userEnvConfig.Username, "The User Username/Email.")
 	createSuperUserCmd.PersistentFlags().StringP("password", "p", userEnvConfig.Password, "The User Password.")
 }
 
-func NewUserEnvConfig() *SuperUser {
-	config := &SuperUser{}
-	err := env.Parse(config)
-	if err != nil {
-		log.Fatal(errors.Wrap(err, "Cannot Marshal Environment into Config"))
-	}
-	return config
-}
-
-func CreateSuperUser(awsConfig *keymanager.AWSConfig, email, password string) {
-	log.Print(awsConfig)
-
+func CreateSuperUser(awsConfig *buyte.AWSConfig, email, password string) {
 	// Authenticate with Cognito
 	sess, _ := session.NewSession(
 		&aws.Config{Region: aws.String(awsConfig.Region)},

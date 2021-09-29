@@ -2,10 +2,12 @@ package keymanager
 
 import (
 	"testing"
+
+	"github.com/rsoury/buyte/buyte"
 )
 
 var (
-	Manager = NewKeyManager("c4cbfa77-300e-4d18-9b70-f1eada8b3aa8", "rsouryis@hotmail.com", &AWSConfig{
+	Manager = NewKeyManager("c4cbfa77-300e-4d18-9b70-f1eada8b3aa8", "rsouryis@hotmail.com", &buyte.AWSConfig{
 		Region:                "ap-southeast-2",
 		APIGatewayId:          "uicv8bfuwi",
 		APIGatewayName:        "buyte-primary-api-dev",

@@ -14,6 +14,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/pkg/errors"
 
+	"github.com/rsoury/buyte/buyte"
 	"github.com/rsoury/buyte/pkg/keymanager"
 )
 
@@ -21,7 +22,7 @@ import (
 func Handler(event events.CognitoEventUserPoolsPostConfirmation) (events.CognitoEventUserPoolsPostConfirmation, error) {
 	userId := event.UserName
 	email := event.Request.UserAttributes["email"]
-	envConfig := keymanager.NewEnvConfig()
+	envConfig := buyte.NewEnvConfig()
 	manager := keymanager.NewKeyManager(userId, email, envConfig)
 
 	/*

@@ -9,6 +9,7 @@ import (
 	cli "github.com/spf13/cobra"
 	"go.uber.org/zap"
 
+	"github.com/rsoury/buyte/buyte"
 	"github.com/rsoury/buyte/pkg/keymanager"
 )
 
@@ -58,7 +59,7 @@ var keysAddCmd = &cli.Command{
 		// 	`public`, isPublic,
 		// )
 
-		AddKey(&keymanager.AWSConfig{
+		AddKey(&buyte.AWSConfig{
 			Region:                region,
 			APIGatewayId:          apiGatewayId,
 			APIGatewayStage:       stage,
@@ -93,7 +94,7 @@ var keysDeleteCmd = &cli.Command{
 			logger.Fatal("User ID flag required. ie. e7b859c1-81d0-4d0f-b839-6b4510304f1c")
 		}
 
-		DeleteKeys(&keymanager.AWSConfig{
+		DeleteKeys(&buyte.AWSConfig{
 			Region:                region,
 			APIGatewayId:          apiGatewayId,
 			APIGatewayStage:       stage,
@@ -107,12 +108,12 @@ func init() {
 	// Add "keys" to "root"
 	rootCmd.AddCommand(keysCmd)
 
-	envConfig := keymanager.NewEnvConfig()
+	envConfig := buyte.NewEnvConfig()
 	keysCmd.PersistentFlags().StringP("region", "r", envConfig.Region, "The region of the environment.")
 	keysCmd.PersistentFlags().StringP("stage", "s", envConfig.APIGatewayStage, "The stage environment.")
-	keysCmd.PersistentFlags().StringP("api-gateway-id", "a", envConfig.APIGatewayId, "The API Gateway ID to use.")
-	keysCmd.PersistentFlags().StringP("api-gateway-usage-plan-id", "x", envConfig.APIGatewayUsagePlanId, "The API Gateway Usage Plan ID to associate the new API keys to.")
-	keysCmd.PersistentFlags().StringP("cognito-user-pool-id", "c", envConfig.CognitoUserPoolId, "The Cognito User Pool ID that the User belongs to.")
+	keysCmd.PersistentFlags().String("api-gateway-id", envConfig.APIGatewayId, "The API Gateway ID to use.")
+	keysCmd.PersistentFlags().String("api-gateway-usage-plan-id", envConfig.APIGatewayUsagePlanId, "The API Gateway Usage Plan ID to associate the new API keys to.")
+	keysCmd.PersistentFlags().String("cognito-user-pool-id", envConfig.CognitoUserPoolId, "The Cognito User Pool ID that the User belongs to.")
 
 	// Add "add" to "keys"
 	keysCmd.AddCommand(keysAddCmd)
@@ -127,7 +128,7 @@ func init() {
 	keysDeleteCmd.MarkFlagRequired("user-id")
 }
 
-func AddKey(awsConfig *keymanager.AWSConfig, userId, email string, isPublic bool) {
+func AddKey(awsConfig *buyte.AWSConfig, userId, email string, isPublic bool) {
 	// Initiate KeyManager
 	manager := keymanager.NewKeyManager(userId, email, awsConfig)
 
@@ -157,7 +158,7 @@ func AddKey(awsConfig *keymanager.AWSConfig, userId, email string, isPublic bool
 	fmt.Println(Green("SUCCESS!"))
 }
 
-func DeleteKeys(awsConfig *keymanager.AWSConfig, userId string) {
+func DeleteKeys(awsConfig *buyte.AWSConfig, userId string) {
 	// Initiate KeyManager
 	manager := keymanager.NewKeyManager(userId, "", awsConfig)
 

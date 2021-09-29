@@ -9,10 +9,11 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	cognito "github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
-	"github.com/caarlos0/env"
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
 	"github.com/thanhpk/randstr"
+
+	"github.com/rsoury/buyte/buyte"
 )
 
 const (
@@ -32,31 +33,13 @@ type CognitoAssociateData struct {
 	ApiKeyId string
 }
 
-// Compatible with "github.com/caarlos0/env"
-type AWSConfig struct {
-	Region                string `env:"AWS_REGION" envDefault:"ap-southeast-2"`
-	APIGatewayId          string `env:"API_GATEWAY_ID"`
-	APIGatewayStage       string `env:"API_GATEWAY_STAGE"`
-	APIGatewayUsagePlanId string `env:"API_GATEWAY_USAGE_PLAN_ID"`
-	CognitoUserPoolId     string `env:"COGNITO_USERPOOLID"`
-}
-
 type Keys struct {
 	UserId string
 	Name   string
-	Config *AWSConfig
+	Config *buyte.AWSConfig
 }
 
-func NewEnvConfig() *AWSConfig {
-	config := &AWSConfig{}
-	err := env.Parse(config)
-	if err != nil {
-		log.Fatal(errors.Wrap(err, "Cannot Marshal Environment into Config"))
-	}
-	return config
-}
-
-func NewKeyManager(userId string, name string, awsConfig *AWSConfig) *Keys {
+func NewKeyManager(userId string, name string, awsConfig *buyte.AWSConfig) *Keys {
 	return &Keys{
 		UserId: userId,
 		Name:   name,
