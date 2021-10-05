@@ -3,13 +3,13 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/briandowns/spinner"
-	g "github.com/machinebox/graphql"
+	"github.com/machinebox/graphql"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -19,17 +19,21 @@ import (
 
 	"github.com/rsoury/buyte/buyte"
 	"github.com/rsoury/buyte/pkg/user"
-	"github.com/rsoury/buyte/store/graphql"
+	store "github.com/rsoury/buyte/store/graphql"
 )
 
+type DeletePaymentParams struct {
+	Id string `json:"id"`
+}
+
 type CreatePaymentParams struct {
-	Name string `json:"name"`
+	Name  string `json:"name"`
 	Image string `json:"image"`
 }
 
 type RepsonsePaymentParams struct {
-	Id string `json:"id"`
-	Name string `json:"name"`
+	Id    string `json:"id"`
+	Name  string `json:"name"`
 	Image string `json:"image"`
 }
 
@@ -74,7 +78,7 @@ var paymentsAddCmd = &cli.Command{
 			APIGatewayStage:       stage,
 			APIGatewayUsagePlanId: apiGatewayUsagePlanId,
 			CognitoUserPoolId:     cognitoUserPoolId,
-			CognitoClientId: 			 cognitoClientId,
+			CognitoClientId:       cognitoClientId,
 		}, &user.SuperUser{
 			Username: email,
 			Password: password,
@@ -102,11 +106,12 @@ var paymentsDeleteCmd = &cli.Command{
 		apiGatewayId, _ := cmd.Flags().GetString("api-gateway-id")
 		apiGatewayUsagePlanId, _ := cmd.Flags().GetString("api-gateway-usage-plan-id")
 		cognitoUserPoolId, _ := cmd.Flags().GetString("cognito-user-pool-id")
+		cognitoClientId, _ := cmd.Flags().GetString("cognito-client-id")
 
 		email, _ := cmd.Flags().GetString("email")
 		password, _ := cmd.Flags().GetString("password")
 
-		name, _ := cmd.Flags().GetString("name")
+		id, _ := cmd.Flags().GetString("id")
 
 		DeletePayment(&buyte.AWSConfig{
 			Region:                region,
@@ -114,10 +119,11 @@ var paymentsDeleteCmd = &cli.Command{
 			APIGatewayStage:       stage,
 			APIGatewayUsagePlanId: apiGatewayUsagePlanId,
 			CognitoUserPoolId:     cognitoUserPoolId,
+			CognitoClientId:       cognitoClientId,
 		}, &user.SuperUser{
 			Username: email,
 			Password: password,
-		}, name)
+		}, id)
 	},
 }
 
@@ -144,8 +150,8 @@ func init() {
 	paymentsAddCmd.PersistentFlags().String("name", "", "The name of the payment option")
 	paymentsAddCmd.PersistentFlags().String("image", "", "The URL of the image for the payment option")
 	paymentsAddCmd.MarkFlagRequired("name")
-	paymentsDeleteCmd.PersistentFlags().String("name", "", "The name of the payment option")
-	paymentsDeleteCmd.MarkFlagRequired("name")
+	paymentsDeleteCmd.PersistentFlags().String("id", "", "The database id of the payment option")
+	paymentsDeleteCmd.MarkFlagRequired("id")
 }
 
 func AddPayment(awsConfig *buyte.AWSConfig, user *user.SuperUser, name, image string) {
@@ -161,23 +167,25 @@ func AddPayment(awsConfig *buyte.AWSConfig, user *user.SuperUser, name, image st
 		"PASSWORD": aws.String(user.Password),
 	}
 
-	auth, err := svc.AdminInitiateAuth(&cognito.AdminInitiateAuthInput{
-		ClientId: &awsConfig.CognitoClientId,
+	input := &cognito.AdminInitiateAuthInput{
+		ClientId:   &awsConfig.CognitoClientId,
 		UserPoolId: &awsConfig.CognitoUserPoolId,
-		AuthFlow: aws.String("ADMIN_USER_PASSWORD_AUTH"),
-		AuthParameters: authParameters,
-	})
+		AuthFlow:   aws.String("ADMIN_USER_PASSWORD_AUTH"),
+	}
+	input.SetAuthParameters(authParameters)
+
+	auth, err := svc.AdminInitiateAuth(input)
 
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "Cannot authenticate with user"))
+		zap.S().Fatal(errors.Wrap(err, "Cannot authenticate with user"))
 	}
 
 	params := &CreatePaymentParams{
-		Name: name,
+		Name:  name,
 		Image: image,
 	}
 
-	req := g.NewRequest(`
+	req := graphql.NewRequest(`
 		mutation CreateMobileWebPayment($input: CreateMobileWebPaymentInput!) {
 			createMobileWebPayment(input: $input) {
 				id
@@ -189,28 +197,87 @@ func AddPayment(awsConfig *buyte.AWSConfig, user *user.SuperUser, name, image st
 	req.Var("input", params)
 	req.Header.Set("Authorization", *auth.AuthenticationResult.AccessToken)
 
-	client := graphql.New()
+	client := store.New()
 	ctx := context.Background()
 
 	var respData map[string]interface{}
-	err = client.Run(ctx, req, &respData);
+	err = client.Run(ctx, req, &respData)
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "Cannot execute creation of new payment option"))
+		zap.S().Fatal(errors.Wrap(err, "Cannot execute creation of new payment option"))
 	}
 
 	response := &RepsonsePaymentParams{}
-	err = mapstructure.Decode(respData["createMobileWebPayment"], response);
+	err = mapstructure.Decode(respData["createMobileWebPayment"], response)
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "Cannot destructure new payment option response parameters"))
+		zap.S().Fatal(errors.Wrap(err, "Cannot destructure payment option response parameters"))
 	}
 
 	if response.Id == "" {
-		log.Fatal(errors.Wrap(err, "New payment option response has not ID"))
+		zap.S().Fatal(errors.Wrap(err, "Payment option response has no ID"))
 	}
 
-	fmt.Println(aurora.Green("New payment option " + name+" has been created!"))
+	fmt.Println(aurora.Green("New payment option " + name + " (" + response.Id + ") has been created!"))
 }
 
-func DeletePayment(awsConfig *buyte.AWSConfig, user *user.SuperUser, userId string) {
+func DeletePayment(awsConfig *buyte.AWSConfig, user *user.SuperUser, id string) {
 	// Authenticate with Cognito
+	// Authenticate with Cognito
+	sess, _ := session.NewSession(
+		&aws.Config{Region: aws.String(awsConfig.Region)},
+	)
+	// Create an APIGateway client from a aws session
+	svc := cognito.New(sess)
+
+	authParameters := map[string]*string{
+		"USERNAME": aws.String(user.Username),
+		"PASSWORD": aws.String(user.Password),
+	}
+
+	input := &cognito.AdminInitiateAuthInput{
+		ClientId:   &awsConfig.CognitoClientId,
+		UserPoolId: &awsConfig.CognitoUserPoolId,
+		AuthFlow:   aws.String("ADMIN_USER_PASSWORD_AUTH"),
+	}
+	input.SetAuthParameters(authParameters)
+
+	auth, err := svc.AdminInitiateAuth(input)
+
+	if err != nil {
+		zap.S().Fatal(errors.Wrap(err, "Cannot authenticate with user"))
+	}
+
+	req := graphql.NewRequest(`
+		mutation DeleteMobileWebPayment($input: DeleteMobileWebPaymentInput!) {
+			deleteMobileWebPayment(input: $input) {
+				id
+				name
+				image
+			}
+		}
+	`)
+	req.Var("input", &DeletePaymentParams{
+		Id: id,
+	})
+	req.Header.Set("Authorization", *auth.AuthenticationResult.AccessToken)
+
+	client := store.New()
+	ctx := context.Background()
+
+	var respData map[string]interface{}
+	err = client.Run(ctx, req, &respData)
+	if err != nil {
+		zap.S().Fatal(errors.Wrap(err, "Cannot execute deletion of payment option"))
+	}
+
+	response := &RepsonsePaymentParams{}
+	err = mapstructure.Decode(respData["deleteMobileWebPayment"], response)
+	if err != nil {
+		zap.S().Fatal(errors.Wrap(err, "Cannot destructure payment option response parameters"))
+	}
+
+	if response.Id == "" {
+		zap.S().Fatal(errors.Wrap(err, "Payment option response has no ID"))
+	}
+
+	fmt.Println(aurora.Green("Payment option " + response.Name + " (" + response.Id + ") has been deleted"))
 }

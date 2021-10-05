@@ -13,11 +13,12 @@
 		"clean": "rimraf build",
 		"format": "./node_modules/.bin/prettier --write \"{src,serverless,scripts}/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
 		"lint": "eslint -c ./.eslintrc.js \"{src,serverless,scripts}/**/*.{js,jsx,ts,tsx}\"",
-		"db": "dotenv dynamodb-admin",
 		"amplify:generate-config": "scripty",
 		"graphql:bootstrap": "scripty",
 		"user:attributes": "scripty",
-		"cognito:style": "scripty"
+		"cognito:style": "scripty",
+		"schema-link:dev": "ln -s ./amplify/schema.graphql ./amplify/dev/amplify/backend/api/buytedev/schema.graphql",
+		"schema-link:prod": "ln -s ./amplify/schema.graphql ./amplify/prod/amplify/backend/api/buyteprod/schema.graphql"
 	},
 	"dependencies": {
 		"@serverless-chrome/lambda": "^1.0.0-55",
@@ -25,14 +26,12 @@
 		"chrome-remote-interface": "^0.27.1"
 	},
 	"devDependencies": {
-		"@aws-amplify/cli": "^6.0.1",
+		"@aws-amplify/cli": "^6.1.1",
 		"amazon-cognito-identity-js": "^3.0.7",
 		"aws-amplify": "^1.1.30",
 		"aws-appsync": "^1.7.1",
 		"aws-sdk": "^2.466.0",
 		"colors": "^1.3.3",
-		"dotenv-cli": "^4.0.0",
-		"dynamodb-admin": "^4.0.3",
 		"es6-promise": "^4.2.5",
 		"eslint": "^6.0.1",
 		"eslint-config-airbnb": "^17.1.1",

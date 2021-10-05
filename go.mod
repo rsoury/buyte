@@ -12,6 +12,7 @@ require (
 	github.com/aws/constructs-go/constructs/v10 v10.0.5
 	github.com/aws/constructs-go/constructs/v3 v3.3.153
 	github.com/aws/jsii-runtime-go v1.34.0
+	github.com/awslabs/aws-lambda-go-api-proxy v0.11.0
 	github.com/briandowns/spinner v1.16.0
 	github.com/buger/jsonparser v1.1.1
 	github.com/caarlos0/env v3.5.0+incompatible
@@ -41,7 +42,6 @@ require (
 
 require (
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
-	github.com/awslabs/aws-lambda-go-api-proxy v0.11.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/certifi/gocertifi v0.0.0-20210507211836-431795d63e8d // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
@@ -53,6 +53,8 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/kr/pretty v0.3.0 // indirect
+	github.com/kr/text v0.2.0 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/matryer/is v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.10 // indirect
@@ -65,6 +67,7 @@ require (
 	github.com/prometheus/common v0.30.0 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/rancher/remotedialer v0.2.6-0.20201012155453-8b1b7bb7d05f // indirect
+	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cast v1.4.1 // indirect

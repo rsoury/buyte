@@ -1,4 +1,4 @@
-type Checkout @model @auth(rules: [{ allow: owner }]) @versioned {
+type Checkout @model @auth(rules: [{ allow: owner }]) {
 	id: ID!
 	label: String!
 	description: String
@@ -28,8 +28,7 @@ type PaymentProvider
 				mutations: [create, update, delete]
 			}
 		]
-	)
-	@versioned {
+	) {
 	id: ID!
 	name: String!
 	image: String!
@@ -66,8 +65,7 @@ type MobileWebPayment
 				mutations: [create, update, delete]
 			}
 		]
-	)
-	@versioned {
+	) {
 	id: ID!
 	name: String!
 	image: String!

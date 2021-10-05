@@ -32,10 +32,12 @@ var createSuperUserCmd = &cli.Command{
 		email, _ := cmd.Flags().GetString("email")
 		password, _ := cmd.Flags().GetString("password")
 		cognitoUserPoolId, _ := cmd.Flags().GetString("cognito-user-pool-id")
+		cognitoClientId, _ := cmd.Flags().GetString("cognito-client-id")
 		region, _ := cmd.Flags().GetString("region")
 
 		CreateSuperUser(&buyte.AWSConfig{
 			Region:            region,
+			CognitoClientId:   cognitoClientId,
 			CognitoUserPoolId: cognitoUserPoolId,
 		}, email, password)
 	},
@@ -48,6 +50,7 @@ func init() {
 	envConfig := buyte.NewEnvConfig()
 	createSuperUserCmd.PersistentFlags().StringP("region", "r", envConfig.Region, "The region of the environment.")
 	createSuperUserCmd.PersistentFlags().String("cognito-user-pool-id", envConfig.CognitoUserPoolId, "The Cognito User Pool ID that the User belongs to.")
+	createSuperUserCmd.PersistentFlags().String("cognito-client-id", envConfig.CognitoClientId, "The Cognito Client ID that the User belongs to.")
 
 	userEnvConfig := user.NewSuperUserEnvConfig()
 	createSuperUserCmd.PersistentFlags().StringP("email", "e", userEnvConfig.Username, "The User Username/Email.")
@@ -65,14 +68,14 @@ func CreateSuperUser(awsConfig *buyte.AWSConfig, email, password string) {
 	// Check if group exist
 	groups, err := svc.ListGroups(&cognito.ListGroupsInput{
 		UserPoolId: &awsConfig.CognitoUserPoolId,
-		Limit: aws.Int64(50),
-	});
+		Limit:      aws.Int64(50),
+	})
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "Cannot fetch Groups"))
 	}
 	superUserGroupExists := false
 	for _, group := range groups.Groups {
-		if group.GroupName == aws.String("SuperUsers") {
+		if *group.GroupName == "SuperUsers" {
 			superUserGroupExists = true
 			break
 		}
@@ -81,8 +84,8 @@ func CreateSuperUser(awsConfig *buyte.AWSConfig, email, password string) {
 	// If not, create it
 	if !superUserGroupExists {
 		_, err = svc.CreateGroup(&cognito.CreateGroupInput{
-			UserPoolId: &awsConfig.CognitoUserPoolId,
-			GroupName: aws.String("SuperUsers"),
+			UserPoolId:  &awsConfig.CognitoUserPoolId,
+			GroupName:   aws.String("SuperUsers"),
 			Description: aws.String("A group of users who have Admin privileges."),
 		})
 		if err != nil {
@@ -115,11 +118,63 @@ func CreateSuperUser(awsConfig *buyte.AWSConfig, email, password string) {
 		log.Fatal(errors.Wrap(err, "Cannot add user to SuperUsers Group"))
 		_, err = svc.AdminDeleteUser(&cognito.AdminDeleteUserInput{
 			UserPoolId: &awsConfig.CognitoUserPoolId,
-			Username: newUser.User.Username,
-		});
-
+			Username:   newUser.User.Username,
+		})
 		if err != nil {
 			log.Fatal(errors.Wrap(err, "Cannot delete the user in error rollback"))
+		}
+	}
+
+	// Process the auth challenge
+	authParameters := map[string]*string{
+		"USERNAME": newUser.User.Username,
+		"PASSWORD": aws.String(password),
+	}
+
+	input := &cognito.AdminInitiateAuthInput{
+		ClientId:   &awsConfig.CognitoClientId,
+		UserPoolId: &awsConfig.CognitoUserPoolId,
+		AuthFlow:   aws.String("ADMIN_USER_PASSWORD_AUTH"),
+	}
+	input.SetAuthParameters(authParameters)
+
+	auth, err := svc.AdminInitiateAuth(input)
+
+	if err != nil {
+		log.Fatal(errors.Wrap(err, "Cannot auth as user"))
+		_, err = svc.AdminDeleteUser(&cognito.AdminDeleteUserInput{
+			UserPoolId: &awsConfig.CognitoUserPoolId,
+			Username:   newUser.User.Username,
+		})
+		if err != nil {
+			log.Fatal(errors.Wrap(err, "Cannot delete the user in error rollback"))
+		}
+	}
+
+	if *auth.ChallengeName == "NEW_PASSWORD_REQUIRED" {
+		// Complete challenge and set new password
+		challengeInput := &cognito.AdminRespondToAuthChallengeInput{
+			ChallengeName: auth.ChallengeName,
+			ChallengeResponses: map[string]*string{
+				"USERNAME":     newUser.User.Username,
+				"NEW_PASSWORD": aws.String(password),
+			},
+			ClientId:   &awsConfig.CognitoClientId,
+			UserPoolId: &awsConfig.CognitoUserPoolId,
+			Session:    auth.Session,
+		}
+		_, err := svc.AdminRespondToAuthChallenge(challengeInput)
+
+		if err != nil {
+			log.Fatal(errors.Wrap(err, "Cannot solve challenge"))
+
+			_, err = svc.AdminDeleteUser(&cognito.AdminDeleteUserInput{
+				UserPoolId: &awsConfig.CognitoUserPoolId,
+				Username:   newUser.User.Username,
+			})
+			if err != nil {
+				log.Fatal(errors.Wrap(err, "Cannot delete the user in error rollback"))
+			}
 		}
 	}
 
