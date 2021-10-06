@@ -214,4 +214,4 @@ Looking to integrate a Legacy Payment Processor or Banking API? Contact us at [W
 
 ## Found this repo interesting?
 
-Feel free to follow me on [Github](https://github.com/rsoury) or [Twitter](https://twitter.com/@ryan_soury)
+Star this project ⭐️⭐️⭐️, and feel free to follow me on [Github](https://github.com/rsoury), [Twitter](https://twitter.com/@ryan_soury) or [Medium](https://rsoury.medium.com/)
