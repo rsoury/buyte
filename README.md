@@ -149,7 +149,10 @@ Further configuration for Cognito will continue in the [Buyte Dashboard](https:/
 
 *We highly advise configuring your `.env.development` or `.env.production` files before proceeding to minimise the number of flags passed to each command.*
 
-1. Create yourself a super user - `buyte create-super-user -e youremail@example.com -p somepassword`
+1. Create yourself a super user
+   ```
+   buyte create-super-user -e youremail@example.com -p somepassword
+   ```
    1. Add your `ADMIN_USERNAME` and `ADMIN_PASSWORD` environment variables to your `.env` file
 2. Set up Cognito Custom User Attributes - for [Dashboard](https://github.com/rsoury/buyte-dashboard)
    ```
