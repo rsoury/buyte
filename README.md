@@ -14,9 +14,13 @@
 ![Buyte Banner](https://github.com/rsoury/buyte/blob/master/examples/images/banner-1544x500.jpg)
 
 <div align="center">
-   <a href="https://www.youtube.com/watch?v=fKnVh8_HLwk">See a demo</a>
+   <a href="https://www.youtube.com/watch?v=fKnVh8_HLwk">Demo</a>
    <span> | </span>
-   <a href="https://github.com/rsoury/buyte/blob/master/examples/images/">See example images</a>
+   <a href="https://github.com/rsoury/buyte/blob/master/examples/images/">Example images</a>
+   <span> | </span>
+   <a href="https://github.com/rsoury/buyte/blob/master/docs/Buyte-Architecture.jpeg">Architecture</a>
+   <span> | </span>
+   <a href="https://github.com/rsoury/buyte/blob/master/docs/Buyte-Checkout-Sequence-Diagram.jpeg">Sequence diagram</a>
 </div>
 
 ## Table of Contents
@@ -26,7 +30,6 @@
 - [Supported Digital Wallets](#supported-digital-wallets)
 - [Supported Payment Processors](#supported-payment-processors)
 - [Overview](#overview)
-- [Architecture](#architecture)
 - [Installation Requirements](#installation-requirements)
 - [Supporting Repositories](#supporting-repositories)
 - [Getting Started](#getting-started)
@@ -71,10 +74,6 @@ This repository responsible for tokenisation of digital wallet payloads before p
 It is comprised of the Serverless API, CLI, Scripts, and AWS Amplify Configuration
 
 The produced Binary is a CLI tool capable of running commands for administrative and development purposes as well as a command for starting the Tokenisation and Payment Processing API.
-
-## Architecture
-
-![Buyte Architecture](https://github.com/rsoury/buyte/blob/master/docs/Buyte-Architecture.jpeg)
 
 ## Installation Requirements
 
