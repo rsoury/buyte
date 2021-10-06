@@ -14,7 +14,7 @@
 ![Buyte Banner](https://github.com/rsoury/buyte/blob/master/examples/images/banner-1544x500.jpg)
 
 <div align="center">
-   <a href="https://www.youtube.com/watch?v=fKnVh8_HLwk">Demo</a>
+   <a href="https://www.youtube.com/watch?v=fKnVh8_HLwk" target="_blank">Demo</a>
    <span> | </span>
    <a href="https://github.com/rsoury/buyte/blob/master/examples/images/">Example images</a>
    <span> | </span>
