@@ -54,6 +54,11 @@ func AuthSetup(awsConfig *buyte.AWSConfig) {
 		{
 			AttributeDataType: aws.String("String"),
 			Mutable:           aws.Bool(true),
+			Name:              aws.String("phone_number"),
+		},
+		{
+			AttributeDataType: aws.String("String"),
+			Mutable:           aws.Bool(true),
 			Name:              aws.String("store_name"),
 		},
 		{
