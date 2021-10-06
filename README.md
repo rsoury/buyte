@@ -36,6 +36,7 @@
   - [3. CLI](#3-cli)
   - [5. Finalise Cognito](#5-finalise-cognito)
 - [Database Set Up](#database-set-up)
+- [(Optional) Update Database Schema](#optional-update-database-schema)
 - [Testing](#testing)
 - [Caveats](#caveats)
 - [Development Endpoints](#development-endpoints)
@@ -172,6 +173,19 @@ Further configuration for Cognito will continue in the [Buyte Dashboard](https:/
 6. List your providers to check which payment options are connected - `buyte providers list`
 
 You should see an output of the Provider details and their associated Payment Options.
+
+## (Optional) Update Database Schema
+
+In case you have unique storage requirements that fall outside of the schema, here's a simple way to update your schema. 
+
+1. Create a symlink to the Amplify backend directory.
+   ```
+   ln -s ./amplify/schema.graphql ./amplify/dev/amplify/backend/api/buytedev/schema.graphql
+   ```
+2. Make modifications to `./amplify/schema.graphql`
+3. `cd ./amplify/dev/`
+4. `amplify api update`
+5. `amplify push`
 
 ## Testing
 
