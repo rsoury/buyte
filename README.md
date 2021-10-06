@@ -35,6 +35,7 @@
   - [3. Serverless](#3-serverless)
   - [3. CLI](#3-cli)
   - [5. Finalise Cognito](#5-finalise-cognito)
+- [Database Set Up](#database-set-up)
 - [Testing](#testing)
 - [Caveats](#caveats)
 - [Development Endpoints](#development-endpoints)
@@ -142,6 +143,34 @@ Go to your AWS Console and visit the Cognito Portal.
 3. Update your `COGNITO_CLIENTID` and `COGNITO_USERPOOLID` your Environment file(s).
 
 Further configuration for Cognito will continue in the [Buyte Dashboard](https://github.com/rsoury/buyte-dashboard) set up.
+
+## Database Set Up
+
+*We highly advise configuring your `.env.development` or `.env.production` files before proceeding to minimise the number of flags passed to each command.*
+
+1. Create yourself a super user - `buyte create-super-user -e youremail@example.com -p somepassword`
+   1. Add your `ADMIN_USERNAME` and `ADMIN_PASSWORD` environment variables to your `.env` file
+2. Create your payment options
+   ```
+   buyte payments add --name "Apple Pay" --image https://s3.url/to-imaage.png
+   buyte payments add --name "Google Pay"
+   ```
+3. Create your payment providers
+   ```
+   buyte providers add --name Adyen
+   buyte providers add --name Stripe
+   ```
+4. Use the List commands to identify the Ids of each Payment and Provider record. ie. `buyte payments list` or `buyte providers list`
+5. Connect your Payment Options to each of your Payment Providers.
+   ```
+   buyte providers connect --provider-id adyen-xxxx-xxxx-xxxx --payment-id applepay-yyyy-yyyy-yyyy
+   buyte providers connect --provider-id stripe-xxxx-xxxx-xxxx --payment-id applepay-yyyy-yyyy-yyyy
+   buyte providers connect --provider-id adyen-xxxx-xxxx-xxxx --payment-id googlepay-yyyy-yyyy-yyyy
+   buyte providers connect --provider-id stripe-xxxx-xxxx-xxxx --payment-id googlepay-yyyy-yyyy-yyyy
+   ```
+6. List your providers to check which payment options are connected - `buyte providers list`
+
+You should see an output of the Provider details and their associated Payment Options.
 
 ## Testing
 
