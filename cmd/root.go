@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/rsoury/buyte/buyte"
 	"github.com/rsoury/buyte/pkg/util"
 
 	"net/http"
@@ -185,4 +186,32 @@ func initProfiler() {
 		go http.ListenAndServe(hostPort, nil)
 		logger.Infof("Profiler enabled on http://%s", hostPort)
 	}
+}
+
+func NewAWSConfigFromCmd(cmd *cli.Command) *buyte.AWSConfig {
+	stage, _ := cmd.Flags().GetString("stage")
+	region, _ := cmd.Flags().GetString("region")
+	apiGatewayId, _ := cmd.Flags().GetString("api-gateway-id")
+	apiGatewayUsagePlanId, _ := cmd.Flags().GetString("api-gateway-usage-plan-id")
+	cognitoUserPoolId, _ := cmd.Flags().GetString("cognito-user-pool-id")
+	cognitoClientId, _ := cmd.Flags().GetString("cognito-client-id")
+
+	return &buyte.AWSConfig{
+		Region:                region,
+		APIGatewayId:          apiGatewayId,
+		APIGatewayStage:       stage,
+		APIGatewayUsagePlanId: apiGatewayUsagePlanId,
+		CognitoUserPoolId:     cognitoUserPoolId,
+		CognitoClientId:       cognitoClientId,
+	}
+}
+
+func AssignAWSFlags(cmd *cli.Command) {
+	envConfig := buyte.NewEnvConfig()
+	cmd.PersistentFlags().StringP("region", "r", envConfig.Region, "The region of the environment.")
+	cmd.PersistentFlags().StringP("stage", "s", envConfig.APIGatewayStage, "The stage environment.")
+	cmd.PersistentFlags().String("api-gateway-id", envConfig.APIGatewayId, "The API Gateway ID to use.")
+	cmd.PersistentFlags().String("api-gateway-usage-plan-id", envConfig.APIGatewayUsagePlanId, "The API Gateway Usage Plan ID to associate the new API keys to.")
+	cmd.PersistentFlags().String("cognito-user-pool-id", envConfig.CognitoUserPoolId, "The Cognito User Pool ID that the User belongs to.")
+	cmd.PersistentFlags().String("cognito-client-id", envConfig.CognitoClientId, "The Cognito Client ID that the User belongs to.")
 }
