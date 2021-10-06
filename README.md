@@ -216,7 +216,7 @@ Simply fork this repo and make it your own, or create a pull request and we can 
 
 ## Enterprise Support
 
-Looking to integrate a Legacy Payment Processor or Banking API? Contact us at [Web Doodle](https://www.webdoodle.com.au/?ref=github-buyte) to discuss tailored solutions.
+Whether you're looking to integrate a Legacy Payment Processor or Banking API, or looking for managed deployment and operation in your cloud, you can contact us at [Web Doodle](https://www.webdoodle.com.au/?ref=github-buyte) to discuss tailored solutions.
 
 ## Found this repo interesting?
 
