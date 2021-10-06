@@ -1,13 +1,13 @@
 <div align="center">
-  <h1>Buyte - WIP</h1>
+  <h1>Buyte</h1>
 </div>
 
 <div align="center">
-  <strong>Digital wallet checkout on a serverless stack</strong>
+  <strong>Digital wallet payment orchestration on a serverless stack</strong>
 </div>
 
 <div align="center">
-  Accelerate your eCommerce website checkout with an enhanced digital wallet checkout solution. Integrate Apple Pay and Google Pay with your Payment Processor(s).
+  Accelerate your eCommerce website checkout with an enhanced digital wallet payment orchestration. Integrate native Apple Pay and Google Pay with your Payment Processor(s).
 </div>
 <br/>
 
@@ -61,6 +61,7 @@
 
 - Stripe
 - Adyen
+- [**Add your own**](#contribution)
 
 ## Overview
 
